@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WimpyApp - Sistema de Pedidos</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #111827; color: white; font-family: sans-serif; }
+        .btn-primary { background: #10B981; color: white; padding: 12px; border-radius: 8px; }
+        .btn-secondary { background: #F59E0B; color: white; padding: 12px; border-radius: 8px; }
+        .glass-effect { background: rgba(17,24,39,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app"></div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+        
+        createApp({
+            setup() {
+                const currentView = ref('home');
+                const user = ref(null);
+                const cart = ref([]);
+                const products = ref([
+                    { id: 1, name: 'Hamburguesa Clásica', price: 15000, category: 'hamburguesas' },
+                    { id: 2, name: 'Hamburguesa Especial', price: 18000, category: 'hamburguesas' },
+                    { id: 3, name: 'Almuerzo Ejecutivo', price: 12000, category: 'almuerzos' }
+                ]);
+
+                return {
+                    currentView,
+                    user,
+                    cart,
+                    products,
+                    navigateTo: (view) => currentView.value = view,
+                    loginClient: () => {
+                        user.value = { type: 'client', name: 'Cliente Demo', points: 150 };
+                        currentView.value = 'client-dashboard';
+                    },
+                    loginAdmin: () => {
+                        user.value = { type: 'admin', name: 'Administrador' };
+                        currentView.value = 'admin-dashboard';
+                    },
+                    addToCart: (product) => {
+                        cart.value.push({...product, cartId: Date.now()});
+                    }
+                };
+            },
+            template: `
+                <div class="min-h-screen bg-gray-900 text-white">
+                    <header v-if="user" class="p-4 flex justify-between items-center bg-gray-800">
+                        <button @click="navigateTo('home')" class="btn-secondary">← Volver</button>
+                        <h1 class="text-xl font-bold">🧠 WimpyApp</h1>
+                        <div class="w-20"></div>
+                    </header>
+
+                    <main class="p-4">
+                        <!-- Vista Home -->
+                        <div v-if="currentView === 'home'" class="flex flex-col items-center justify-center min-h-screen">
+                            <div class="text-center mb-12">
+                                <h1 class="text-4xl font-bold mb-4">🧠 WimpyApp</h1>
+                                <p class="text-gray-300">Sistema de pedidos para restaurante</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 gap-8 max-w-md w-full">
+                                <div class="glass-effect rounded-2xl p-8 text-center" @click="loginClient">
+                                    <div class="text-6xl mb-4">👤</div>
+                                    <button class="btn-primary w-full">Acceder como Cliente</button>
+                                </div>
+                                
+                                <div class="glass-effect rounded-2xl p-8 text-center" @click="loginAdmin">
+                                    <div class="text-6xl mb-4">🛠️</div>
+                                    <button class="btn-secondary w-full">Acceder como Admin</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dashboard Cliente -->
+                        <div v-if="currentView === 'client-dashboard'">
+                            <h2 class="text-2xl font-bold mb-6 text-center">Bienvenido, {{ user.name }}</h2>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <h3 class="text-xl font-bold mb-4">🛒 Productos</h3>
+                                    <div class="grid grid-cols-1 gap-4">
+                                        <div v-for="product in products" :key="product.id" 
+                                             class="glass-effect rounded-xl p-4 flex justify-between items-center">
+                                            <div>
+                                                <h4 class="font-bold">{{ product.name }}</h4>
+                                                <p class="text-green-500">${{ product.price.toLocaleString() }}</p>
+                                            </div>
+                                            <button @click="addToCart(product)" class="btn-primary text-sm">
+                                                Agregar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="glass-effect rounded-xl p-4">
+                                    <h3 class="text-xl font-bold mb-4">🛍️ Carrito ({{ cart.length }})</h3>
+                                    <div v-if="cart.length === 0" class="text-center py-4 text-gray-400">
+                                        Carrito vacío
+                                    </div>
+                                    <div v-else>
+                                        <div v-for="item in cart" :key="item.cartId" class="flex justify-between mb-2">
+                                            <span>{{ item.name }}</span>
+                                            <span class="text-green-500">${{ item.price.toLocaleString() }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dashboard Admin -->
+                        <div v-if="currentView === 'admin-dashboard'">
+                            <h2 class="text-2xl font-bold mb-6">Panel de Administración</h2>
+                            <div class="glass-effect rounded-xl p-6">
+                                <h3 class="text-xl font-bold mb-4">📊 Estadísticas</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="text-center p-4 bg-gray-800 rounded">
+                                        <div class="text-2xl text-green-500">24</div>
+                                        <div class="text-sm">Pedidos Hoy</div>
+                                    </div>
+                                    <div class="text-center p-4 bg-gray-800 rounded">
+                                        <div class="text-2xl text-yellow-500">$1.2M</div>
+                                        <div class="text-sm">Ventas</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `
+        }).mount('#app');
+    </script>
+</body>
+</html>
