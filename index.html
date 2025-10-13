@@ -3,849 +3,526 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WimpyApp - Sistema de Pedidos 100% Gratuito</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#10B981',
-                        secondary: '#F59E0B',
-                        dark: '#111827'
-                    }
-                }
-            }
+    <title>WimpyApp - Sistema de Pedidos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        // URL del backend REAL - ACTUALIZADA con tu URL
-        const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxykANPHHxPZjcJNOycIeEndU3RuNQURMi7QkiL0I36Mzjvrsdze6CajfK-A6uJqHiLCw/exec';
-    </script>
-    
-    <style>
-        .glass-effect {
-            background: rgba(17, 24, 39, 0.8);
-            backdrop-filter: blur(10px);
+        body {
+            background: #111827;
+            color: white;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+        
+        .app-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .app-subtitle {
+            color: #9CA3AF;
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .card-description {
+            color: #D1D5DB;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
         }
         
         .btn-primary {
-            background-color: #10B981;
+            background: #10B981;
             color: white;
-            transition: all 0.3s;
         }
         
         .btn-primary:hover {
-            background-color: #0da271;
+            background: #0DA271;
             transform: translateY(-2px);
         }
         
         .btn-secondary {
-            background-color: #F59E0B;
+            background: #F59E0B;
             color: white;
-            transition: all 0.3s;
         }
         
         .btn-secondary:hover {
-            background-color: #e0910a;
+            background: #E0910A;
             transform: translateY(-2px);
         }
         
-        .fade-enter-active, .fade-leave-active {
-            transition: opacity 0.3s ease;
+        .hidden {
+            display: none;
         }
         
-        .fade-enter-from, .fade-leave-to {
-            opacity: 0;
+        .back-btn {
+            background: #6B7280;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
         }
         
-        /* Estilos para scrollbar personalizado */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .points-badge {
+            background: #1F2937;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 10px 0;
         }
         
-        ::-webkit-scrollbar-track {
-            background: #1f2937;
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
         }
         
-        ::-webkit-scrollbar-thumb {
-            background: #10B981;
-            border-radius: 4px;
+        .product-card {
+            background: #1F2937;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        ::-webkit-scrollbar-thumb:hover {
-            background: #0da271;
+        .product-info h4 {
+            margin-bottom: 5px;
+        }
+        
+        .product-price {
+            color: #10B981;
+            font-weight: bold;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #1F2937;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-primary {
+            color: #10B981;
+        }
+        
+        .stat-secondary {
+            color: #F59E0B;
         }
     </style>
 </head>
-<body class="bg-dark min-h-screen text-white">
-    <div id="app"></div>
+<body>
+    <div class="container">
+        <!-- Vista Home -->
+        <div id="home-view">
+            <div class="header">
+                <h1 class="app-title">🧠 WimpyApp</h1>
+                <p class="app-subtitle">Sistema de pedidos para restaurante</p>
+            </div>
+            
+            <div class="card" onclick="showClientLogin()">
+                <div class="card-icon">👤</div>
+                <h2 class="card-title">Cliente</h2>
+                <p class="card-description">Haz pedidos, acumula puntos y confirma entregas</p>
+                <button class="btn btn-primary">Acceder como Cliente</button>
+            </div>
+            
+            <div class="card" onclick="showAdminLogin()">
+                <div class="card-icon">🛠️</div>
+                <h2 class="card-title">Administrador</h2>
+                <p class="card-description">Gestiona productos, pedidos y genera reportes</p>
+                <button class="btn btn-secondary">Acceder como Admin</button>
+            </div>
+        </div>
+
+        <!-- Vista Login Cliente -->
+        <div id="client-login-view" class="hidden">
+            <a class="back-btn" onclick="showHome()">← Volver</a>
+            <div class="card">
+                <h2 class="card-title">Acceso Cliente</h2>
+                <p class="card-description">Ingresa tu número de WhatsApp</p>
+                
+                <input type="tel" id="client-phone" placeholder="+57 300 123 4567" 
+                       style="width: 100%; padding: 15px; margin: 15px 0; border-radius: 8px; border: 1px solid #374151; background: #1F2937; color: white;">
+                
+                <button class="btn btn-primary" onclick="generatePin()">Generar PIN de Acceso</button>
+                
+                <div id="pin-section" class="hidden" style="margin-top: 20px;">
+                    <p>PIN generado: <strong id="generated-pin"></strong></p>
+                    <input type="text" id="client-pin" placeholder="Ingresa el PIN" 
+                           style="width: 100%; padding: 15px; margin: 15px 0; border-radius: 8px; border: 1px solid #374151; background: #1F2937; color: white;">
+                    <button class="btn btn-primary" onclick="verifyPin()">Verificar PIN</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Dashboard Cliente -->
+        <div id="client-dashboard-view" class="hidden">
+            <a class="back-btn" onclick="showHome()">← Cerrar Sesión</a>
+            
+            <div class="header">
+                <h2 id="client-name">Cliente</h2>
+                <div class="points-badge">
+                    ⭐ <span id="client-points">150</span> puntos
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">🛒 Catálogo de Productos</h3>
+                <div class="product-grid" id="product-list">
+                    <!-- Los productos se cargan aquí con JavaScript -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">🛍️ Carrito (<span id="cart-count">0</span>)</h3>
+                <div id="cart-items">
+                    <!-- Los items del carrito aparecen aquí -->
+                </div>
+                <div id="cart-empty" style="text-align: center; padding: 20px; color: #9CA3AF;">
+                    Carrito vacío
+                </div>
+                <div id="cart-total" class="hidden">
+                    <div style="display: flex; justify-content: space-between; margin: 20px 0; padding-top: 20px; border-top: 1px solid #374151;">
+                        <strong>Total:</strong>
+                        <strong id="total-amount">$0</strong>
+                    </div>
+                    <button class="btn btn-primary" onclick="confirmOrder()">Confirmar Pedido</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Login Admin -->
+        <div id="admin-login-view" class="hidden">
+            <a class="back-btn" onclick="showHome()">← Volver</a>
+            <div class="card">
+                <h2 class="card-title">Acceso Administrador</h2>
+                <p class="card-description">Ingresa el PIN de administrador</p>
+                
+                <input type="password" id="admin-pin" placeholder="PIN de administrador" 
+                       style="width: 100%; padding: 15px; margin: 15px 0; border-radius: 8px; border: 1px solid #374151; background: #1F2937; color: white;">
+                
+                <p style="color: #9CA3AF; font-size: 0.9rem; margin-bottom: 15px;">PIN por defecto: 1995</p>
+                
+                <button class="btn btn-secondary" onclick="loginAdmin()">Acceder al Panel</button>
+            </div>
+        </div>
+
+        <!-- Vista Dashboard Admin -->
+        <div id="admin-dashboard-view" class="hidden">
+            <a class="back-btn" onclick="showHome()">← Cerrar Sesión</a>
+            
+            <div class="header">
+                <h2>Panel de Administración</h2>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>📦</div>
+                    <div class="stat-number stat-primary">24</div>
+                    <div>Pedidos Hoy</div>
+                </div>
+                <div class="stat-card">
+                    <div>💰</div>
+                    <div class="stat-number stat-secondary">$1.2M</div>
+                    <div>Ventas Totales</div>
+                </div>
+                <div class="stat-card">
+                    <div>👥</div>
+                    <div class="stat-number stat-primary">18</div>
+                    <div>Clientes Activos</div>
+                </div>
+                <div class="stat-card">
+                    <div>⭐</div>
+                    <div class="stat-number stat-secondary">1,240</div>
+                    <div>Puntos Otorgados</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">🚀 Acciones Rápidas</h3>
+                <button class="btn btn-secondary" style="margin-bottom: 10px;" onclick="generateInvoice()">
+                    📄 Generar Cuenta de Cobro
+                </button>
+                <button class="btn btn-primary" style="margin-bottom: 10px;">
+                    🧾 Gestionar Productos
+                </button>
+                <button class="btn btn-primary" style="margin-bottom: 10px;">
+                    📊 Ver Reportes Mensuales
+                </button>
+                <button class="btn btn-primary">
+                    💾 Backup de Datos
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        const { createApp, ref, computed, onMounted } = Vue;
+        // Datos de la aplicación
+        let cart = [];
+        let currentUser = null;
+        let generatedPin = '';
+        
+        // Productos de ejemplo
+        const products = [
+            { id: 1, name: 'Hamburguesa Clásica', price: 15000, category: 'hamburguesas' },
+            { id: 2, name: 'Hamburguesa Especial', price: 18000, category: 'hamburguesas' },
+            { id: 3, name: 'Almuerzo Ejecutivo', price: 12000, category: 'almuerzos' },
+            { id: 4, name: 'Almuerzo Vegetariano', price: 10000, category: 'almuerzos' },
+            { id: 5, name: 'Café Americano', price: 3000, category: 'bebidas' },
+            { id: 6, name: 'Jugo Natural', price: 5000, category: 'bebidas' }
+        ];
 
-        createApp({
-            setup() {
-                // Estado de la aplicación
-                const currentView = ref('home');
-                const user = ref(null);
-                const cart = ref([]);
-                const products = ref([]);
-                const orders = ref([]);
-                const loading = ref(false);
-                const adminPin = ref('');
-                const clientPhone = ref('');
-                const clientPin = ref('');
-                const clientPassword = ref('');
-                const newPassword = ref('');
-                const confirmPassword = ref('');
-                const loginStep = ref('phone'); // 'phone', 'temp-pin', 'password', 'change-password'
-                const loginMessage = ref('');
+        // Funciones para cambiar vistas
+        function showView(viewId) {
+            // Ocultar todas las vistas
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('client-login-view').classList.add('hidden');
+            document.getElementById('client-dashboard-view').classList.add('hidden');
+            document.getElementById('admin-login-view').classList.add('hidden');
+            document.getElementById('admin-dashboard-view').classList.add('hidden');
+            
+            // Mostrar la vista solicitada
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function showHome() {
+            showView('home-view');
+            cart = [];
+            currentUser = null;
+            updateCart();
+        }
+
+        function showClientLogin() {
+            showView('client-login-view');
+            document.getElementById('pin-section').classList.add('hidden');
+            document.getElementById('client-phone').value = '';
+            document.getElementById('client-pin').value = '';
+        }
+
+        function showAdminLogin() {
+            showView('admin-login-view');
+            document.getElementById('admin-pin').value = '';
+        }
+
+        // Funciones del cliente
+        function generatePin() {
+            const phone = document.getElementById('client-phone').value || '+573001234567';
+            generatedPin = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            document.getElementById('generated-pin').textContent = generatedPin;
+            document.getElementById('pin-section').classList.remove('hidden');
+            
+            alert('PIN generado: ' + generatedPin + ' para el número ' + phone);
+        }
+
+        function verifyPin() {
+            const enteredPin = document.getElementById('client-pin').value;
+            const phone = document.getElementById('client-phone').value || '+573001234567';
+            
+            if (enteredPin === generatedPin) {
+                currentUser = {
+                    type: 'client',
+                    phone: phone,
+                    name: 'Cliente ' + phone,
+                    points: Math.floor(Math.random() * 200) + 50
+                };
                 
-                // Computed properties
-                const cartTotal = computed(() => {
-                    return cart.value.reduce((sum, item) => sum + item.price, 0);
+                document.getElementById('client-name').textContent = currentUser.name;
+                document.getElementById('client-points').textContent = currentUser.points;
+                
+                loadProducts();
+                showView('client-dashboard-view');
+            } else {
+                alert('PIN incorrecto. Intenta nuevamente.');
+            }
+        }
+
+        function loadProducts() {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = '';
+            
+            products.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.className = 'product-card';
+                productElement.innerHTML = `
+                    <div class="product-info">
+                        <h4>${product.name}</h4>
+                        <div style="color: #9CA3AF; font-size: 0.9rem;">${product.category}</div>
+                        <div class="product-price">$${product.price.toLocaleString()}</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addToCart(${product.id})" style="width: auto; padding: 10px 20px;">
+                        Agregar
+                    </button>
+                `;
+                productList.appendChild(productElement);
+            });
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                cart.push({
+                    ...product,
+                    cartId: Date.now()
                 });
+                updateCart();
+            }
+        }
 
-                const cartItemsCount = computed(() => cart.value.length);
+        function removeFromCart(cartId) {
+            cart = cart.filter(item => item.cartId !== cartId);
+            updateCart();
+        }
 
-                // Métodos
-                const navigateTo = (view) => {
-                    currentView.value = view;
-                };
-
-                const clientLogin = async () => {
-                    if (!clientPhone.value) {
-                        loginMessage.value = 'Por favor ingresa tu número de WhatsApp';
-                        return;
-                    }
-
-                    loading.value = true;
-                    try {
-                        const response = await fetch(`${API_BASE_URL}?action=clientLogin&phone=${encodeURIComponent(clientPhone.value)}`);
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            if (data.needsTempPin) {
-                                loginStep.value = 'temp-pin';
-                                loginMessage.value = data.message;
-                            } else if (data.needsPassword) {
-                                loginStep.value = 'password';
-                                loginMessage.value = data.message;
-                            }
-                        } else {
-                            if (data.needsRegistration) {
-                                loginMessage.value = data.message;
-                                // Aquí podrías redirigir a un formulario de solicitud de registro
-                            } else {
-                                loginMessage.value = data.message;
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        loginMessage.value = 'Error de conexión. Usando modo demo.';
-                        // Modo demo si el backend no está disponible
-                        user.value = {
-                            type: 'client',
-                            phone: clientPhone.value,
-                            name: 'Cliente Demo',
-                            points: 150
-                        };
-                        currentView.value = 'client-dashboard';
-                    } finally {
-                        loading.value = false;
-                    }
-                };
-
-                const verifyTempPin = async () => {
-                    if (!clientPin.value) {
-                        loginMessage.value = 'Por favor ingresa el PIN';
-                        return;
-                    }
-
-                    loading.value = true;
-                    try {
-                        const response = await fetch(`${API_BASE_URL}?action=verifyTempPin&phone=${encodeURIComponent(clientPhone.value)}&pin=${encodeURIComponent(clientPin.value)}`);
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            if (data.needsPasswordChange) {
-                                loginStep.value = 'change-password';
-                                loginMessage.value = data.message;
-                            }
-                        } else {
-                            loginMessage.value = data.message;
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        loginMessage.value = 'Error de conexión. Continuando en modo demo.';
-                        loginStep.value = 'change-password';
-                    } finally {
-                        loading.value = false;
-                    }
-                };
-
-                const changePassword = async () => {
-                    if (!newPassword.value || !confirmPassword.value) {
-                        loginMessage.value = 'Por favor completa ambos campos';
-                        return;
-                    }
-
-                    if (newPassword.value !== confirmPassword.value) {
-                        loginMessage.value = 'Las contraseñas no coinciden';
-                        return;
-                    }
-
-                    if (newPassword.value.length < 6) {
-                        loginMessage.value = 'La contraseña debe tener al menos 6 caracteres';
-                        return;
-                    }
-
-                    loading.value = true;
-                    try {
-                        const response = await fetch(`${API_BASE_URL}?action=changePassword&phone=${encodeURIComponent(clientPhone.value)}&newPassword=${encodeURIComponent(newPassword.value)}`);
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            loginMessage.value = data.message;
-                            // Ahora hacer login con la nueva contraseña
-                            await loginWithPassword();
-                        } else {
-                            loginMessage.value = data.message;
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        loginMessage.value = 'Error de conexión. Continuando en modo demo.';
-                        user.value = {
-                            type: 'client',
-                            phone: clientPhone.value,
-                            name: 'Cliente ' + clientPhone.value,
-                            points: 150
-                        };
-                        currentView.value = 'client-dashboard';
-                    } finally {
-                        loading.value = false;
-                    }
-                };
-
-                const loginWithPassword = async () => {
-                    const password = loginStep.value === 'change-password' ? newPassword.value : clientPassword.value;
-
-                    loading.value = true;
-                    try {
-                        const response = await fetch(`${API_BASE_URL}?action=loginWithPassword&phone=${encodeURIComponent(clientPhone.value)}&password=${encodeURIComponent(password)}`);
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            user.value = {
-                                type: 'client',
-                                phone: data.client.phone,
-                                name: data.client.name,
-                                points: data.client.points,
-                                email: data.client.email
-                            };
-                            currentView.value = 'client-dashboard';
-                            loginMessage.value = '';
-                        } else {
-                            loginMessage.value = data.message;
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        loginMessage.value = 'Error de conexión. Usando modo demo.';
-                        user.value = {
-                            type: 'client',
-                            phone: clientPhone.value,
-                            name: 'Cliente ' + clientPhone.value,
-                            points: 150
-                        };
-                        currentView.value = 'client-dashboard';
-                    } finally {
-                        loading.value = false;
-                    }
-                };
-
-                const loginAdmin = () => {
-                    if (adminPin.value === '1995') {
-                        user.value = {
-                            type: 'admin',
-                            name: 'Administrador'
-                        };
-                        currentView.value = 'admin-dashboard';
-                    } else {
-                        alert('PIN incorrecto. Usa 1995 para demo.');
-                    }
-                };
-
-                const logout = () => {
-                    user.value = null;
-                    cart.value = [];
-                    currentView.value = 'home';
-                    adminPin.value = '';
-                    clientPhone.value = '';
-                    clientPin.value = '';
-                    clientPassword.value = '';
-                    newPassword.value = '';
-                    confirmPassword.value = '';
-                    loginStep.value = 'phone';
-                    loginMessage.value = '';
-                };
-
-                const addToCart = (product) => {
-                    cart.value.push({
-                        ...product,
-                        cartId: Date.now()
-                    });
-                };
-
-                const removeFromCart = (cartId) => {
-                    cart.value = cart.value.filter(item => item.cartId !== cartId);
-                };
-
-                const confirmOrder = async () => {
-                    if (cart.value.length === 0) {
-                        alert('Tu carrito está vacío');
-                        return;
-                    }
-                    
-                    const order = {
-                        id: Date.now(),
-                        items: [...cart.value],
-                        total: cartTotal.value,
-                        date: new Date().toLocaleString('es-CO'),
-                        status: 'pendiente'
-                    };
-                    
-                    try {
-                        const response = await fetch(`${API_BASE_URL}?action=createOrder`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `phone=${encodeURIComponent(user.value.phone)}&items=${encodeURIComponent(JSON.stringify(cart.value))}&total=${cartTotal.value}`
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            order.id = data.orderId;
-                            if (data.pointsEarned > 0) {
-                                user.value.points += data.pointsEarned;
-                            }
-                            alert(`✅ ${data.message}`);
-                        } else {
-                            throw new Error(data.message);
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        alert(`🛒 Pedido #${order.id} confirmado (modo demo). Total: $${order.total.toLocaleString()}`);
-                    }
-                    
-                    orders.value.push(order);
-                    cart.value = [];
-                };
-
-                const loadProducts = async () => {
-                    try {
-                        const response = await fetch(`${API_BASE_URL}?action=getProducts`);
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            products.value = data.products;
-                        } else {
-                            throw new Error('Error cargando productos');
-                        }
-                    } catch (error) {
-                        console.error('Error cargando productos:', error);
-                        // Productos de demo como fallback
-                        products.value = [
-                            { id: 1, name: 'Hamburguesa Clásica', price: 15000, category: 'hamburguesas', image: '🍔' },
-                            { id: 2, name: 'Hamburguesa Especial', price: 18000, category: 'hamburguesas', image: '🍔' },
-                            { id: 3, name: 'Almuerzo Ejecutivo', price: 12000, category: 'almuerzos', image: '🍛' },
-                            { id: 4, name: 'Almuerzo Vegetariano', price: 10000, category: 'almuerzos', image: '🥗' },
-                            { id: 5, name: 'Café Americano', price: 3000, category: 'bebidas', image: '☕' },
-                            { id: 6, name: 'Jugo Natural', price: 5000, category: 'bebidas', image: '🧃' },
-                            { id: 7, name: 'Papas Fritas', price: 7000, category: 'acompañamientos', image: '🍟' },
-                            { id: 8, name: 'Ensalada César', price: 9000, category: 'ensaladas', image: '🥬' }
-                        ];
-                    }
-                };
-
-                const generateInvoice = () => {
-                    if (orders.value.length === 0) {
-                        alert('No hay pedidos para generar cuenta de cobro');
-                        return;
-                    }
-
-                    const invoiceContent = `
-CUENTA DE COBRO - WIMPYAPP
-===========================
-Fecha: ${new Date().toLocaleDateString('es-CO')}
-Cliente: ${user.value.name}
-Teléfono: ${user.value.phone}
-NIT: 123456789-0
-Consecutivo: ${new Date().getFullYear()}${(new Date().getMonth() + 1).toString().padStart(2, '0')}INV01
-
-DETALLE DE PEDIDOS:
--------------------
-${orders.value.map(order => 
-`Pedido #${order.id} - ${order.date}
-${order.items.map(item => `  • ${item.name}: $${item.price.toLocaleString()}`).join('\n')}
-  TOTAL PEDIDO: $${order.total.toLocaleString()}
-`
-).join('\n')}
-
-TOTAL GENERAL: $${orders.value.reduce((sum, order) => sum + order.total, 0).toLocaleString()}
-
-FIRMA AUTORIZADA:
-_________________
-${user.value.name}
-
-¡Gracias por su preferencia!
-WimpyApp - Sistema 100% Gratuito
-                    `;
-                    
-                    const blob = new Blob([invoiceContent], { type: 'text/plain' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `cuenta_cobro_${Date.now()}.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                };
-
-                const simulateWhatsAppOrder = () => {
-                    if (cart.value.length === 0) {
-                        alert('Tu carrito está vacío');
-                        return;
-                    }
-
-                    const message = `¡Hola! Quiero hacer un pedido:\n\n${cart.value.map(item => 
-                        `• ${item.name} - $${item.price.toLocaleString()}`
-                    ).join('\n')}\n\nTotal: $${cartTotal.value.toLocaleString()}\n\nCliente: ${user.value.name}`;
-                    
-                    const whatsappUrl = `https://wa.me/573001234567?text=${encodeURIComponent(message)}`;
-                    window.open(whatsappUrl, '_blank');
-                };
-
-                const resetLogin = () => {
-                    loginStep.value = 'phone';
-                    clientPin.value = '';
-                    clientPassword.value = '';
-                    newPassword.value = '';
-                    confirmPassword.value = '';
-                    loginMessage.value = '';
-                };
-
-                // Inicialización
-                onMounted(() => {
-                    loadProducts();
-                });
-
-                return {
-                    currentView,
-                    user,
-                    cart,
-                    products,
-                    orders,
-                    loading,
-                    adminPin,
-                    clientPhone,
-                    clientPin,
-                    clientPassword,
-                    newPassword,
-                    confirmPassword,
-                    loginStep,
-                    loginMessage,
-                    cartTotal,
-                    cartItemsCount,
-                    navigateTo,
-                    clientLogin,
-                    verifyTempPin,
-                    changePassword,
-                    loginWithPassword,
-                    loginAdmin,
-                    logout,
-                    addToCart,
-                    removeFromCart,
-                    confirmOrder,
-                    generateInvoice,
-                    simulateWhatsAppOrder,
-                    resetLogin
-                };
-            },
-            template: `
-                <div class="min-h-screen bg-dark">
-                    <!-- Header -->
-                    <header v-if="user" class="glass-effect p-4 flex justify-between items-center sticky top-0 z-10">
-                        <button @click="logout" class="btn-secondary px-4 py-2 rounded-lg flex items-center">
-                            <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+        function updateCart() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            const cartEmpty = document.getElementById('cart-empty');
+            const cartTotal = document.getElementById('cart-total');
+            const totalAmount = document.getElementById('total-amount');
+            
+            cartCount.textContent = cart.length;
+            
+            if (cart.length === 0) {
+                cartEmpty.classList.remove('hidden');
+                cartTotal.classList.add('hidden');
+                cartItems.innerHTML = '';
+            } else {
+                cartEmpty.classList.add('hidden');
+                cartTotal.classList.remove('hidden');
+                
+                cartItems.innerHTML = '';
+                let total = 0;
+                
+                cart.forEach(item => {
+                    total += item.price;
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div>
+                            <div>${item.name}</div>
+                            <div style="color: #10B981; font-size: 0.9rem;">$${item.price.toLocaleString()}</div>
+                        </div>
+                        <button onclick="removeFromCart(${item.cartId})" style="background: #EF4444; color: white; border: none; border-radius: 6px; padding: 5px 10px; cursor: pointer;">
+                            ✕
                         </button>
-                        <h1 class="text-xl font-bold">🧠 WimpyApp</h1>
-                        <div class="w-24"></div>
-                    </header>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+                
+                totalAmount.textContent = '$' + total.toLocaleString();
+            }
+        }
 
-                    <!-- Vistas -->
-                    <main class="container mx-auto p-4 max-w-6xl">
-                        <!-- Vista Home -->
-                        <div v-if="currentView === 'home'" class="flex flex-col items-center justify-center min-h-screen p-4">
-                            <div class="text-center mb-12">
-                                <h1 class="text-5xl font-bold mb-4">🧠 WimpyApp</h1>
-                                <p class="text-xl text-gray-300 mb-2">Sistema de pedidos para restaurante</p>
-                                <p class="text-gray-400">Conectado a Base de Datos Real</p>
-                                <div class="mt-4 text-sm text-gray-500">
-                                    <p>Sistema de autenticación seguro • Puntos reales • Pedidos persistentes</p>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl w-full">
-                                <div 
-                                    class="glass-effect rounded-2xl p-8 text-center cursor-pointer transition-all hover:scale-105"
-                                    @click="navigateTo('client-login')"
-                                >
-                                    <div class="text-6xl mb-4">👤</div>
-                                    <h2 class="text-2xl font-bold mb-4">Cliente</h2>
-                                    <p class="text-gray-300 mb-6">Haz pedidos, acumula puntos y confirma entregas</p>
-                                    <button class="btn-primary w-full py-3 rounded-xl font-semibold">
-                                        Acceder como Cliente
-                                    </button>
-                                </div>
-                                
-                                <div 
-                                    class="glass-effect rounded-2xl p-8 text-center cursor-pointer transition-all hover:scale-105"
-                                    @click="navigateTo('admin-login')"
-                                >
-                                    <div class="text-6xl mb-4">🛠️</div>
-                                    <h2 class="text-2xl font-bold mb-4">Administrador</h2>
-                                    <p class="text-gray-300 mb-6">Gestiona productos, pedidos y genera reportes</p>
-                                    <button class="btn-secondary w-full py-3 rounded-xl font-semibold">
-                                        Acceder como Admin
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-12 text-center text-gray-400">
-                                <p class="text-lg mb-2">🚀 Conectado a Backend Real</p>
-                                <div class="flex justify-center space-x-4 text-sm">
-                                    <span class="bg-green-500 px-3 py-1 rounded">Google Sheets</span>
-                                    <span class="bg-blue-500 px-3 py-1 rounded">Apps Script</span>
-                                    <span class="bg-purple-500 px-3 py-1 rounded">SQL</span>
-                                </div>
-                            </div>
-                        </div>
+        function confirmOrder() {
+            if (cart.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            alert(`¡Pedido confirmado! Total: $${total.toLocaleString()}\n\nSerá procesado pronto.`);
+            
+            cart = [];
+            updateCart();
+        }
 
-                        <!-- Login Cliente -->
-                        <div v-if="currentView === 'client-login'" class="max-w-md mx-auto mt-10">
-                            <div class="glass-effect rounded-2xl p-8">
-                                <h2 class="text-2xl font-bold mb-6 text-center">Acceso Cliente</h2>
-                                
-                                <!-- Paso 1: Ingresar Teléfono -->
-                                <div v-if="loginStep === 'phone'">
-                                    <div class="mb-6">
-                                        <label class="block text-gray-300 mb-2">Número de WhatsApp</label>
-                                        <input 
-                                            type="tel" 
-                                            v-model="clientPhone"
-                                            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                                            placeholder="+57 300 123 4567"
-                                        >
-                                        <p class="text-gray-400 text-sm mt-2">Debes estar pre-registrado en el sistema</p>
-                                    </div>
-                                    <button 
-                                        @click="clientLogin"
-                                        :disabled="loading"
-                                        class="btn-primary w-full py-3 rounded-xl font-semibold disabled:opacity-50"
-                                    >
-                                        {{ loading ? 'Verificando...' : 'Continuar' }}
-                                    </button>
-                                </div>
-                                
-                                <!-- Paso 2: PIN Temporal -->
-                                <div v-else-if="loginStep === 'temp-pin'">
-                                    <div class="mb-6">
-                                        <p class="text-gray-300 mb-4">Para el número: {{ clientPhone }}</p>
-                                        <p class="text-center text-sm text-gray-400 mb-4">Ingresa los últimos 4 dígitos de tu celular como PIN temporal</p>
-                                        <label class="block text-gray-300 mb-2">PIN Temporal</label>
-                                        <input 
-                                            type="text" 
-                                            v-model="clientPin"
-                                            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary text-center text-2xl"
-                                            placeholder="1234"
-                                            maxlength="4"
-                                        >
-                                    </div>
-                                    <button 
-                                        @click="verifyTempPin"
-                                        :disabled="loading"
-                                        class="btn-primary w-full py-3 rounded-xl font-semibold disabled:opacity-50"
-                                    >
-                                        {{ loading ? 'Verificando...' : 'Validar PIN' }}
-                                    </button>
-                                    <button 
-                                        @click="resetLogin" 
-                                        class="mt-4 text-gray-400 hover:text-white w-full text-center"
-                                    >
-                                        Cambiar número
-                                    </button>
-                                </div>
-                                
-                                <!-- Paso 3: Cambiar Contraseña -->
-                                <div v-else-if="loginStep === 'change-password'">
-                                    <div class="mb-6">
-                                        <p class="text-gray-300 mb-4">Crea tu contraseña permanente</p>
-                                        <label class="block text-gray-300 mb-2">Nueva Contraseña</label>
-                                        <input 
-                                            type="password" 
-                                            v-model="newPassword"
-                                            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                                            placeholder="Mínimo 6 caracteres"
-                                        >
-                                        <label class="block text-gray-300 mb-2 mt-4">Confirmar Contraseña</label>
-                                        <input 
-                                            type="password" 
-                                            v-model="confirmPassword"
-                                            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                                            placeholder="Repite tu contraseña"
-                                        >
-                                    </div>
-                                    <button 
-                                        @click="changePassword"
-                                        :disabled="loading"
-                                        class="btn-primary w-full py-3 rounded-xl font-semibold disabled:opacity-50"
-                                    >
-                                        {{ loading ? 'Guardando...' : 'Crear Contraseña' }}
-                                    </button>
-                                </div>
-                                
-                                <!-- Paso 4: Contraseña Permanente -->
-                                <div v-else-if="loginStep === 'password'">
-                                    <div class="mb-6">
-                                        <p class="text-gray-300 mb-4">Para el número: {{ clientPhone }}</p>
-                                        <label class="block text-gray-300 mb-2">Contraseña</label>
-                                        <input 
-                                            type="password" 
-                                            v-model="clientPassword"
-                                            class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                                            placeholder="Ingresa tu contraseña"
-                                        >
-                                    </div>
-                                    <button 
-                                        @click="loginWithPassword"
-                                        :disabled="loading"
-                                        class="btn-primary w-full py-3 rounded-xl font-semibold disabled:opacity-50"
-                                    >
-                                        {{ loading ? 'Ingresando...' : 'Iniciar Sesión' }}
-                                    </button>
-                                    <button 
-                                        @click="resetLogin" 
-                                        class="mt-4 text-gray-400 hover:text-white w-full text-center"
-                                    >
-                                        Cambiar número
-                                    </button>
-                                </div>
-                                
-                                <!-- Mensajes -->
-                                <div v-if="loginMessage" class="mt-4 p-3 rounded-lg" :class="loginMessage.includes('éxito') || loginMessage.includes('correcto') ? 'bg-green-500' : 'bg-red-500'">
-                                    <p class="text-white text-sm">{{ loginMessage }}</p>
-                                </div>
-                                
-                                <button 
-                                    @click="navigateTo('home')" 
-                                    class="mt-4 text-gray-400 hover:text-white w-full text-center"
-                                >
-                                    Volver al Inicio
-                                </button>
-                            </div>
-                        </div>
+        // Funciones del administrador
+        function loginAdmin() {
+            const pin = document.getElementById('admin-pin').value;
+            
+            if (pin === '1995') {
+                currentUser = {
+                    type: 'admin',
+                    name: 'Administrador'
+                };
+                showView('admin-dashboard-view');
+            } else {
+                alert('PIN incorrecto. Usa 1995 para demo.');
+            }
+        }
 
-                        <!-- Dashboard Cliente -->
-                        <div v-if="currentView === 'client-dashboard'">
-                            <div class="mb-6 text-center">
-                                <h2 class="text-2xl font-bold">Bienvenido, {{ user.name }}</h2>
-                                <div class="mt-2 bg-gray-800 inline-flex items-center px-4 py-2 rounded-full">
-                                    <span class="text-secondary mr-2">⭐</span>
-                                    <span>{{ user.points }} puntos reales</span>
-                                </div>
-                                <p class="text-gray-400 text-sm mt-2">Teléfono: {{ user.phone }}</p>
-                            </div>
+        function generateInvoice() {
+            alert('Generando cuenta de cobro en PDF...\n\nEsta función estaría conectada al backend en una versión completa.');
+        }
 
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                <!-- Catálogo -->
-                                <div class="lg:col-span-2">
-                                    <h3 class="text-xl font-bold mb-4">🛒 Catálogo de Productos</h3>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div 
-                                            v-for="product in products" 
-                                            :key="product.id" 
-                                            class="glass-effect rounded-xl p-4 flex justify-between items-center"
-                                        >
-                                            <div>
-                                                <div class="text-2xl mb-2">{{ product.image || '📦' }}</div>
-                                                <h4 class="font-bold">{{ product.name }}</h4>
-                                                <p class="text-gray-300 text-sm">{{ product.category }}</p>
-                                                <p class="text-primary font-bold mt-2">${{ product.price.toLocaleString() }}</p>
-                                            </div>
-                                            <button 
-                                                @click="addToCart(product)" 
-                                                class="btn-primary px-4 py-2 rounded-lg text-sm"
-                                            >
-                                                Agregar
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Carrito y Pedidos -->
-                                <div class="space-y-6">
-                                    <!-- Carrito -->
-                                    <div>
-                                        <h3 class="text-xl font-bold mb-4">🛍️ Carrito ({{ cartItemsCount }})</h3>
-                                        <div class="glass-effect rounded-xl p-4">
-                                            <div v-if="cart.length === 0" class="text-center py-4 text-gray-400">
-                                                Carrito vacío
-                                            </div>
-                                            <div v-else>
-                                                <div 
-                                                    v-for="item in cart" 
-                                                    :key="item.cartId" 
-                                                    class="flex justify-between items-center mb-3 pb-3 border-b border-gray-700"
-                                                >
-                                                    <div>
-                                                        <p class="font-medium">{{ item.name }}</p>
-                                                        <p class="text-primary text-sm">${{ item.price.toLocaleString() }}</p>
-                                                    </div>
-                                                    <button 
-                                                        @click="removeFromCart(item.cartId)" 
-                                                        class="text-red-500 hover:text-red-400"
-                                                    >
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-700">
-                                                    <span class="font-bold">Total:</span>
-                                                    <span class="text-primary font-bold">${{ cartTotal.toLocaleString() }}</span>
-                                                </div>
-                                                <div class="grid grid-cols-1 gap-2 mt-4">
-                                                    <button 
-                                                        @click="confirmOrder" 
-                                                        class="btn-primary py-3 rounded-lg font-semibold"
-                                                    >
-                                                        Confirmar Pedido
-                                                    </button>
-                                                    <button 
-                                                        @click="simulateWhatsAppOrder" 
-                                                        class="bg-green-600 hover:bg-green-700 py-3 rounded-lg font-semibold"
-                                                    >
-                                                        Pedir por WhatsApp
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Historial de Pedidos -->
-                                    <div>
-                                        <h3 class="text-xl font-bold mb-4">📦 Pedidos Recientes</h3>
-                                        <div class="glass-effect rounded-xl p-4 max-h-64 overflow-y-auto">
-                                            <div v-if="orders.length === 0" class="text-center py-4 text-gray-400">
-                                                No hay pedidos recientes
-                                            </div>
-                                            <div v-else>
-                                                <div 
-                                                    v-for="order in orders.slice().reverse().slice(0, 5)" 
-                                                    :key="order.id" 
-                                                    class="mb-3 pb-3 border-b border-gray-700 last:border-0"
-                                                >
-                                                    <div class="flex justify-between items-start">
-                                                        <div>
-                                                            <p class="font-medium">Pedido #{{ order.id }}</p>
-                                                            <p class="text-gray-400 text-sm">{{ order.date }}</p>
-                                                            <p class="text-primary text-sm">{{ order.items.length }} productos</p>
-                                                        </div>
-                                                        <span class="bg-primary px-2 py-1 rounded text-sm">
-                                                            ${{ order.total.toLocaleString() }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Login Admin -->
-                        <div v-if="currentView === 'admin-login'" class="max-w-md mx-auto mt-10">
-                            <div class="glass-effect rounded-2xl p-8">
-                                <h2 class="text-2xl font-bold mb-6 text-center">Acceso Administrador</h2>
-                                <div class="mb-6">
-                                    <label class="block text-gray-300 mb-2">PIN de administrador</label>
-                                    <input 
-                                        type="password" 
-                                        v-model="adminPin"
-                                        class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-secondary"
-                                        placeholder="Ingresa el PIN"
-                                    >
-                                    <p class="text-gray-400 text-sm mt-2">PIN por defecto: 1995</p>
-                                </div>
-                                <button 
-                                    @click="loginAdmin" 
-                                    class="btn-secondary w-full py-3 rounded-xl font-semibold"
-                                >
-                                    Acceder al Panel
-                                </button>
-                                <button 
-                                    @click="navigateTo('home')" 
-                                    class="mt-4 text-gray-400 hover:text-white w-full text-center"
-                                >
-                                    Volver al Inicio
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Dashboard Admin -->
-                        <div v-if="currentView === 'admin-dashboard'">
-                            <h2 class="text-2xl font-bold mb-6">Panel de Administración</h2>
-                            
-                            <!-- Estadísticas -->
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                                <div class="glass-effect rounded-xl p-4 text-center">
-                                    <div class="text-2xl text-primary mb-2">📦</div>
-                                    <h3 class="font-bold text-lg">24</h3>
-                                    <p class="text-gray-400 text-sm">Pedidos Hoy</p>
-                                </div>
-                                <div class="glass-effect rounded-xl p-4 text-center">
-                                    <div class="text-2xl text-secondary mb-2">💰</div>
-                                    <h3 class="font-bold text-lg">$1.2M</h3>
-                                    <p class="text-gray-400 text-sm">Ventas Totales</p>
-                                </div>
-                                <div class="glass-effect rounded-xl p-4 text-center">
-                                    <div class="text-2xl text-primary mb-2">👥</div>
-                                    <h3 class="font-bold text-lg">18</h3>
-                                    <p class="text-gray-400 text-sm">Clientes Activos</p>
-                                </div>
-                                <div class="glass-effect rounded-xl p-4 text-center">
-                                    <div class="text-2xl text-secondary mb-2">⭐</div>
-                                    <h3 class="font-bold text-lg">1,240</h3>
-                                    <p class="text-gray-400 text-sm">Puntos Otorgados</p>
-                                </div>
-                            </div>
-
-                            <!-- Acciones Rápidas -->
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div class="glass-effect rounded-xl p-6">
-                                    <h3 class="text-xl font-bold mb-4">📊 Resumen de Ventas</h3>
-                                    <div class="h-48 flex items-end justify-between px-4">
-                                        <div 
-                                            v-for="(value, index) in [40, 60, 75, 55, 80, 65, 90, 70, 85, 60, 75, 80]" 
-                                            :key="index" 
-                                            class="flex flex-col items-center"
-                                        >
-                                            <div 
-                                                class="bg-primary rounded-t w-3 transition-all hover:opacity-80" 
-                                                :style="{ height: value + '%' }"
-                                            ></div>
-                                            <span class="text-xs mt-2 text-gray-400">{{ index + 1 }}</span
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            showHome();
+        });
+    </script>
+</body>
+</html>
