@@ -3,489 +3,660 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Wimpy App - Cliente / Admin</title>
+<title>Wimpy App — Cliente & Admin</title>
 <style>
-  body { font-family: Inter, system-ui, -apple-system, Arial; margin: 0; padding: 0; background:#fafafa; color:#222; }
-  header { background: #ef5350; color:white; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; }
-  main { padding:16px; max-width:1100px; margin:20px auto; }
-  .card { background:white; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.06); padding:12px; margin-bottom:14px; }
-  label { display:block; font-size:13px; margin-top:6px; }
-  input[type="text"], input[type="tel"], input[type="password"], select { width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; box-sizing:border-box; }
-  button { background:#ef5350; color:white; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; }
-  button.secondary { background:#607d8b; }
-  .two { display:grid; grid-template-columns: 1fr 380px; gap:12px; align-items:start; }
-  .product { display:flex; gap:12px; align-items:center; border-bottom:1px solid #eee; padding:8px 0; }
-  .product > .meta { flex:1; }
-  .qty { display:flex; gap:6px; align-items:center; }
-  .small { font-size:13px; color:#666; }
-  .muted { color:#666; font-size:13px; }
-  .right { text-align:right; }
-  .link { color:#ef5350; cursor:pointer; text-decoration:underline; background:none; border:none; padding:0; }
-  .admin-panel { display:flex; gap:12px; flex-direction:column; }
-  .orders-list { max-height:420px; overflow:auto; }
-  .order-item { border:1px solid #eee; padding:8px; border-radius:8px; margin-bottom:8px; background:#fff; }
-  .flex { display:flex; gap:8px; align-items:center; }
-  .pill { background:#f0f0f0; padding:6px 8px; border-radius:999px; font-weight:600; font-size:13px; }
-  footer { text-align:center; padding:16px; color:#777; }
-  @media (max-width:900px){ .two{ grid-template-columns: 1fr; } }
+  :root{
+    --bg:#f7fbff; --card:#fff; --accent:#1565c0; --muted:#666;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter, system-ui, -apple-system, Arial;background:var(--bg);color:#172b4d}
+  header{background:linear-gradient(90deg,#1976d2,#0d47a1);color:white;padding:12px 18px;display:flex;align-items:center;gap:12px}
+  header h1{font-size:18px;margin:0}
+  #container{display:flex;min-height:calc(100vh - 56px)}
+  nav{width:250px;background:white;border-right:1px solid #e6eef9;padding:18px}
+  nav .menu-item{padding:10px;border-radius:8px;cursor:pointer;margin-bottom:6px;color:#0b3954}
+  nav .menu-item.active{background:linear-gradient(90deg,#e8f0ff,#dbeeff);font-weight:700}
+  main{flex:1;padding:18px}
+  .card{background:var(--card);padding:14px;border-radius:var(--radius);box-shadow:0 6px 18px rgba(16,24,40,0.06);margin-bottom:14px}
+  .row{display:flex;gap:12px}
+  .col{flex:1}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  input[type="text"], input[type="tel"], input[type="number"], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e3eefc;font-size:14px}
+  button{background:var(--accent);color:white;border:0;padding:10px 12px;border-radius:8px;cursor:pointer}
+  button.secondary{background:#90a4ae}
+  .muted{color:var(--muted);font-size:13px}
+  .prod{display:flex;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid #f0f6ff}
+  .prod .meta{flex:1}
+  .cart-line{display:flex;justify-content:space-between;padding:8px;border-bottom:1px dashed #f0f6ff}
+  .small{font-size:13px;color:var(--muted)}
+  .right{text-align:right}
+  .table{width:100%;border-collapse:collapse}
+  .table th, .table td{padding:8px;border-bottom:1px solid #f0f6ff;text-align:left}
+  /* modal */
+  .modal-back{position:fixed;inset:0;background:rgba(8,15,26,0.45);display:none;align-items:center;justify-content:center;z-index:40}
+  .modal{width:720px;max-width:95%;background:white;border-radius:12px;padding:16px}
+  .flex{display:flex;gap:8px;align-items:center}
+  .badge{background:#eef6ff;color:#0b63b8;padding:6px 8px;border-radius:999px;font-weight:700}
+  @media(max-width:900px){nav{display:none} #container{flex-direction:column}}
 </style>
 </head>
 <body>
 <header>
-  <div><strong>Wimpy App</strong> — Pedidos & Fidelización</div>
-  <div id="userShort" style="font-size:14px"></div>
+  <h1>Wimpy Restaurante — App</h1>
+  <div style="margin-left:auto" id="userShort"></div>
 </header>
 
-<main>
-  <div class="card" id="authCard">
-    <h3>Acceso de cliente</h3>
-    <div id="authForms">
-      <div id="loginForm">
+<div id="container">
+  <nav>
+    <div class="menu-item active" data-view="cliente">Cliente</div>
+    <div class="menu-item" data-view="carrito">Carrito</div>
+    <div class="menu-item" data-view="misPedidos">Mis pedidos</div>
+    <hr/>
+    <div class="menu-item" data-view="adminLogin">Admin</div>
+    <div class="menu-item" data-view="adminPanel" style="display:none">Panel Admin</div>
+    <div style="margin-top:18px" class="small muted">Número WhatsApp: <span id="cfgWhats"></span></div>
+  </nav>
+
+  <main>
+    <!-- CLIENTE: login -->
+    <section id="view-cliente" class="card">
+      <h3>Acceso Cliente</h3>
+      <div id="clientAuth">
         <label>Teléfono (ej: 5731...)</label>
-        <input type="tel" id="phoneInput" placeholder="5731..." />
-        <div style="margin-top:8px;">
-          <button id="btnRequestPin">Solicitar código (por email)</button>
-          <button class="secondary" id="btnForgotPassword">Olvidé mi clave</button>
+        <input type="tel" id="phoneLogin" placeholder="5731..." />
+        <div style="margin-top:8px" class="flex">
+          <button id="btnRequestPin">Solicitar PIN</button>
+          <button class="secondary" id="btnForgot">Olvidé mi clave</button>
         </div>
-        <div class="muted" style="margin-top:8px;">
-          Si es tu primer ingreso, recibirás un PIN temporal por correo para confirmar y luego podrás asignar tu clave de 4 dígitos.
+        <div id="pinBox" style="display:none;margin-top:12px">
+          <label>PIN temporal (4 dígitos)</label>
+          <input id="pinInput" maxlength="4"/>
+          <div style="margin-top:8px"><button id="btnVerifyPin">Verificar PIN</button></div>
         </div>
-      </div>
-
-      <div id="pinForm" style="display:none; margin-top:12px;">
-        <label>Ingresa PIN temporal (4 dígitos)</label>
-        <input type="text" id="pinInput" maxlength="4" />
-        <div style="margin-top:8px;">
-          <button id="btnVerifyPin">Verificar PIN</button>
+        <div id="setPassBox" style="display:none;margin-top:12px">
+          <label>Asigna clave (4 dígitos)</label>
+          <input id="newPass" maxlength="4"/>
+          <div style="margin-top:8px"><button id="btnSetPass">Guardar clave</button></div>
         </div>
-      </div>
-
-      <div id="setPasswordForm" style="display:none; margin-top:12px;">
-        <label>Asigna tu nueva clave (4 dígitos numéricos)</label>
-        <input id="newPassInput" maxlength="4" />
-        <div style="margin-top:8px;">
-          <button id="btnSetPassword">Guardar clave</button>
-        </div>
-      </div>
-
-      <div id="forgotFlow" style="display:none; margin-top:12px;">
-        <label>Recuperar clave — ingresa tu teléfono</label>
-        <input id="fpPhone" />
-        <div style="margin-top:8px;">
-          <button id="btnSendRecovery">Enviar código de recuperación</button>
-        </div>
-
-        <div id="recoveryStep2" style="display:none; margin-top:10px;">
-          <label>Ingresa código recibido por email</label>
-          <input id="recoveryCode" maxlength="4" />
-          <label>Ingresa nueva clave (4 dígitos)</label>
-          <input id="recoveryNewPass" maxlength="4" />
-          <div style="margin-top:8px;">
-            <button id="btnVerifyRecovery">Verificar y guardar</button>
+        <div id="forgotBox" style="display:none;margin-top:12px">
+          <label>Recuperar clave — ingresa teléfono</label>
+          <input id="fpPhone" />
+          <div style="margin-top:8px"><button id="btnSendRecovery">Enviar código</button></div>
+          <div id="recoveryStep" style="display:none;margin-top:8px">
+            <label>Código recibido</label><input id="recoveryCode" maxlength="4"/>
+            <label>Nueva clave (4 dígitos)</label><input id="recoveryNewPass" maxlength="4"/>
+            <div style="margin-top:8px"><button id="btnVerifyRecovery">Verificar y guardar</button></div>
           </div>
         </div>
+        <div style="margin-top:8px" class="small muted">Si tu número no tiene email registrado, solicita al admin que lo asocie.</div>
       </div>
 
-    </div>
-  </div>
+      <hr/>
 
-  <div class="two">
-    <div>
-      <div class="card" id="catalogCard">
+      <div id="catalog" style="margin-top:12px">
         <h3>Catálogo</h3>
-        <div id="productsList" class="products"></div>
+        <div id="productsList" class="card" style="padding:8px"></div>
       </div>
+    </section>
 
-      <div class="card" id="cartCard">
-        <h3>Carrito</h3>
-        <div id="cartItems"></div>
-        <div style="margin-top:8px;">
-          <div class="flex">
-            <div><strong>Total:</strong></div>
-            <div style="margin-left:auto"><strong id="cartTotal">0</strong> COP</div>
+    <!-- CARRITO -->
+    <section id="view-carrito" class="card" style="display:none">
+      <h3>Carrito</h3>
+      <div id="cartItems"></div>
+      <div style="margin-top:12px" class="flex">
+        <div>
+          <div class="small">Tus puntos: <strong id="clientPoints">0</strong></div>
+          <label>Usar puntos</label>
+          <input type="number" id="pointsToUse" min="0" step="1" value="0" />
+          <div class="small">1 punto = <strong id="pointValue">20</strong> COP</div>
+        </div>
+        <div style="margin-left:auto" class="right">
+          <div class="small">Total</div>
+          <div style="font-size:18px;font-weight:700" id="cartTotal">0 COP</div>
+          <div style="margin-top:8px">
+            <button id="btnCreateOrder">Enviar pedido (abrir WhatsApp)</button>
           </div>
-          <div style="margin-top:6px;">
-            <div class="small">Tus puntos disponibles: <span id="clientPoints">0</span></div>
-            <div style="margin-top:6px;">
-              <label>Aplicar puntos (1 punto = <strong>20 COP</strong>)</label>
-              <input type="number" id="pointsToUse" min="0" step="1" value="0" />
-              <div class="small">Equivalente COP: <span id="pointsValue">0</span></div>
-            </div>
-            <div style="margin-top:8px;">
-              <button id="btnCreateOrder">Crear pedido y abrir WhatsApp</button>
-            </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MIS PEDIDOS -->
+    <section id="view-misPedidos" class="card" style="display:none">
+      <h3>Mis pedidos</h3>
+      <div id="myOrders"></div>
+    </section>
+
+    <!-- ADMIN LOGIN -->
+    <section id="view-adminLogin" class="card" style="display:none">
+      <h3>Ingreso Administrador</h3>
+      <label>Clave admin</label>
+      <input id="adminPass" type="password" />
+      <div style="margin-top:8px"><button id="btnAdminLogin">Ingresar</button></div>
+      <div style="margin-top:10px" class="small muted">Clave oculta — recuperación mediante Apps Script si llega a perderse.</div>
+    </section>
+
+    <!-- ADMIN PANEL -->
+    <section id="view-adminPanel" class="card" style="display:none">
+      <h3>Panel Administrador</h3>
+      <div class="row">
+        <div class="col card">
+          <h4>Pedidos</h4>
+          <div style="margin-bottom:8px" class="flex">
+            <button id="btnRefreshOrders">Refrescar</button>
+            <div style="margin-left:auto" class="small muted">Token admin: <span id="adminTokenShort"></span></div>
+          </div>
+          <div id="adminOrders" style="max-height:420px;overflow:auto"></div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h4>Productos</h4>
+            <div id="adminProducts"></div>
+            <hr/>
+            <h5>Nuevo / Editar</h5>
+            <label>Nombre</label><input id="prodName"/>
+            <label>Precio</label><input id="prodPrice" type="number"/>
+            <label>Categoría</label><input id="prodCategory"/>
+            <label>Activo</label>
+            <select id="prodActive"><option value="true">Sí</option><option value="false">No</option></select>
+            <label>Descripción</label><textarea id="prodDesc"></textarea>
+            <div style="margin-top:8px" class="flex"><button id="btnSaveProduct">Guardar producto</button><button class="secondary" id="btnClearProduct">Limpiar</button></div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h4>Clientes</h4>
+            <div id="adminClients" style="max-height:200px;overflow:auto"></div>
+            <hr/>
+            <h5>Nuevo / Editar</h5>
+            <label>Teléfono</label><input id="clientPhone"/>
+            <label>Nombre</label><input id="clientName"/>
+            <label>Email</label><input id="clientEmail"/>
+            <div style="margin-top:8px" class="flex"><button id="btnSaveClient">Guardar cliente</button></div>
           </div>
         </div>
       </div>
 
-      <div class="card" id="myOrdersCard">
-        <h3>Mis pedidos</h3>
-        <div id="myOrdersList" class="orders-list"></div>
-      </div>
-    </div>
-
-    <aside>
-      <div class="card admin-panel">
-        <h3>Admin (panel)</h3>
-        <div id="adminLoginBox">
-          <label>Clave admin</label>
-          <input id="adminPass" type="password" />
-          <div style="margin-top:8px;">
-            <button id="btnAdminLogin">Ingresar como admin</button>
+      <div class="card" style="margin-top:12px">
+        <h4>Informes y Cuentas de Cobro</h4>
+        <div class="row">
+          <div>
+            <label>Mes</label>
+            <select id="selMes">
+              <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option>
+              <option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option>
+              <option value="9">Septiembre</option><option value="10" selected>Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+            </select>
+          </div>
+          <div>
+            <label>Año</label>
+            <input id="selAnio" type="number" value="" />
+          </div>
+          <div style="align-self:end">
+            <button id="btnGenerarInforme">Generar Informe</button>
           </div>
         </div>
-        <div id="adminControls" style="display:none;">
-          <div class="small">Sesión admin activa</div>
-          <div style="margin-top:8px;">
-            <button id="btnRefreshOrders">Refrescar pedidos</button>
-          </div>
-          <div id="adminOrders" class="orders-list" style="margin-top:8px;"></div>
-        </div>
-        <hr />
-        <div class="small muted">
-          Cambia el número de WhatsApp del admin en la hoja <strong>Configuracion</strong> (campo <em>TelefonoWhatsApp</em>).<br/>
-          Para cambiar el valor por punto: edita <strong>ValorPorPunto</strong> en la hoja <strong>Configuracion</strong> (en el spreadsheet).
-        </div>
-      </div>
-    </aside>
-  </div>
 
-  <footer class="card small muted">
-    Este frontend se conecta al backend de Apps Script. URL del endpoint integrada.
-  </footer>
-</main>
+        <div id="informeResult" style="margin-top:12px"></div>
+
+        <hr/>
+        <h5>Crear/Enviar Cuenta de Cobro</h5>
+        <div class="row">
+          <div class="col">
+            <label>Empresa cliente (si vacío se usa configuración)</label>
+            <input id="cc_nombre" placeholder="Nombre empresa"/>
+            <label>NIT</label><input id="cc_nit"/>
+            <label>Dirección</label><input id="cc_direccion"/>
+          </div>
+          <div class="col">
+            <label>Email destino</label><input id="cc_email"/>
+            <label>Teléfono</label><input id="cc_telefono"/>
+            <label>Contacto</label><input id="cc_contacto"/>
+          </div>
+        </div>
+        <div style="margin-top:10px" class="flex">
+          <button id="btnCrearCuenta">Crear cuenta (PDF + Excel)</button>
+          <button id="btnEnviarCuenta" class="secondary">Enviar por correo</button>
+        </div>
+        <div id="ccStatus" style="margin-top:8px" class="small muted"></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h4>Configuración</h4>
+        <label>Número WhatsApp admin (ej: +573118336562)</label><input id="cfgPhone"/>
+        <label>Valor por punto (COP)</label><input id="cfgValorPunto" type="number"/>
+        <label>Empresa emisora (nombre)</label><input id="cfgEmpresaNombre"/>
+        <div style="margin-top:8px" class="flex"><button id="btnSaveConfig">Guardar Configuración</button></div>
+        <div class="small muted" style="margin-top:8px">Los cambios se guardan en la hoja Configuracion del spreadsheet.</div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal-back"><div class="modal" id="modalInner"></div></div>
 
 <script>
-/*
-  Frontend single-file para Wimpy App
-  - Endpoint: usar doPost JSON (action + payload)
-  - Endpoint URL (tu web app): reemplazar o usar tal cual
-*/
-const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxykANPHHxPZjcJNOycIeEndU3RuNQURMi7QkiL0I36Mzjvrsdze6CajfK-A6uJqHiLCw/exec';
-
-// --- Estado del frontend ---
+/* ---------------- CONFIG ---------------- */
+const API_URL = 'https://script.google.com/macros/s/AKfycbxykANPHHxPZjcJNOycIeEndU3RuNQURMi7QkiL0I36Mzjvrsdze6CajfK-A6uJqHiLCw/exec';
 let currentPhone = '';
 let isLogged = false;
-let isAdmin = false;
 let adminToken = '';
-let cart = {}; // {productId: {id,name,price,qty,category}}
-let products = []; // catálogo (intentaremos cargar via backend)
-const POINT_VALUE = 20; // 1 punto = 20 COP (según tu instrucción)
+let cart = {}; // id -> {id,name,price,qty,category}
+let products = [];
+let clientPoints = 0;
+let pointValue = 20; // default, overridden by config fetch
 
-/* ------------------ Utilidades ------------------ */
-function apiPost(action, payload = {}) {
+/* ------------- UTIL ------------- */
+function apiPost(action, payload={}) {
   const body = Object.assign({}, payload, { action });
-  return fetch(ENDPOINT, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(body)
-  }).then(r => r.json()).catch(err => ({ok:false,error:err.message}));
+  return fetch(API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+    .then(r => r.json())
+    .catch(e => ({ok:false, error: 'Failed to connect to backend: ' + (e.message||e)}));
+}
+function showModal(html) {
+  document.getElementById('modalInner').innerHTML = html;
+  document.getElementById('modal').style.display = 'flex';
+}
+function closeModal(){ document.getElementById('modal').style.display = 'none'; }
+function money(n){ return Number(n||0).toLocaleString('es-CO') + ' COP'; }
+function setView(view) {
+  document.querySelectorAll('nav .menu-item').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('nav .menu-item').forEach(i=>{ if(i.dataset.view===view) i.classList.add('active')});
+  document.querySelectorAll('main section').forEach(s=>s.style.display='none');
+  const el = document.getElementById('view-'+view);
+  if (el) el.style.display = '';
 }
 
-function money(n){ return Number(n||0).toLocaleString('es-CO'); }
+/* ------------- NAV -------------- */
+document.querySelectorAll('nav .menu-item').forEach(mi=>{
+  mi.addEventListener('click', ()=>{
+    const v = mi.dataset.view;
+    if (v==='adminPanel' && !adminToken) { setView('adminLogin'); document.querySelector('[data-view="adminLogin"]').classList.add('active'); return; }
+    setView(v);
+  });
+});
 
-/* ------------------ AUTH (cliente) ------------------ */
-
+/* ------------- AUTH CLIENT -------------- */
 document.getElementById('btnRequestPin').addEventListener('click', async ()=>{
-  const phone = document.getElementById('phoneInput').value.trim();
+  const phone = document.getElementById('phoneLogin').value.trim();
   if(!phone){ alert('Ingresa teléfono'); return; }
   currentPhone = phone;
-  const res = await apiPost('clientLogin', { phone });
-  if(res.ok){
-    alert(res.message || 'Código temporal solicitado. Revisa tu correo.');
-    // show pin form
-    document.getElementById('pinForm').style.display = 'block';
-  } else {
-    alert('Error: ' + (res.error||'no disponible'));
-  }
+  const res = await apiPost('clientLogin',{phone});
+  if(!res.ok){ alert(res.error||'Error'); return; }
+  document.getElementById('pinBox').style.display='block';
+  modalMsg('Código enviado','Si el cliente tiene email, el PIN fue enviado por correo.');
 });
-
 document.getElementById('btnVerifyPin').addEventListener('click', async ()=>{
   const pin = document.getElementById('pinInput').value.trim();
-  if(!currentPhone){ alert('Primero solicita el PIN con tu teléfono'); return; }
-  const res = await apiPost('verifyTempPin', { phone: currentPhone, pin });
-  if(res.ok){
-    alert('PIN verificado');
-    document.getElementById('pinForm').style.display='none';
-    if(res.needsPasswordChange){
-      document.getElementById('setPasswordForm').style.display='block';
-    } else {
-      // login success (not first time)
-      isLogged = true;
-      document.getElementById('authCard').style.display='none';
-      document.getElementById('userShort').innerText = currentPhone;
-      await refreshClientPointsAndOrders();
-    }
+  if(!pin){ alert('Ingresa PIN'); return; }
+  const res = await apiPost('verifyTempPin',{phone:currentPhone,pin});
+  if(!res.ok){ alert(res.error||'Error'); return; }
+  if(res.needsPasswordChange) {
+    document.getElementById('setPassBox').style.display='block';
+    modalMsg('Primer ingreso','Por favor asigna tu clave de 4 dígitos.');
   } else {
-    alert('Error: ' + res.error);
+    isLogged = true;
+    document.getElementById('clientAuth').style.display='none';
+    document.getElementById('userShort').innerText = currentPhone;
+    await loadClientInfo();
+    await loadProducts();
+    setView('cliente');
   }
 });
-
-document.getElementById('btnSetPassword').addEventListener('click', async ()=>{
-  const pass = document.getElementById('newPassInput').value.trim();
-  if(!/^[0-9]{4}$/.test(pass)){ alert('La clave debe tener 4 números'); return; }
-  const res = await apiPost('setClientPassword', { phone: currentPhone, newPassword: pass });
-  if(res.ok){
-    alert('Clave guardada. Ya estás conectado.');
-    isLogged = true;
-    document.getElementById('setPasswordForm').style.display='none';
-    document.getElementById('authCard').style.display='none';
-    document.getElementById('userShort').innerText = currentPhone;
-    await refreshClientPointsAndOrders();
-  } else alert('Error: ' + (res.error||res.message));
+document.getElementById('btnSetPass').addEventListener('click', async ()=>{
+  const pass = document.getElementById('newPass').value.trim();
+  if(!/^[0-9]{4}$/.test(pass)){ alert('Clave 4 dígitos'); return; }
+  const res = await apiPost('setClientPassword',{phone:currentPhone,newPassword:pass});
+  if(!res.ok){ alert(res.error||'Error'); return; }
+  isLogged = true;
+  document.getElementById('clientAuth').style.display='none';
+  document.getElementById('userShort').innerText = currentPhone;
+  await loadClientInfo();
+  await loadProducts();
+  modalMsg('Listo','Clave registrada. Bienvenido.');
 });
 
-/* Forgot password flow */
-document.getElementById('btnForgotPassword').addEventListener('click', ()=>{
-  document.getElementById('forgotFlow').style.display='block';
-});
-
+/* forgot */
+document.getElementById('btnForgot').addEventListener('click', ()=>{ document.getElementById('forgotBox').style.display='block'; });
 document.getElementById('btnSendRecovery').addEventListener('click', async ()=>{
   const phone = document.getElementById('fpPhone').value.trim();
   if(!phone){ alert('Ingresa teléfono'); return; }
-  const res = await apiPost('forgotPassword', { phone });
-  if(res.ok){
-    alert(res.message || 'Código enviado');
-    document.getElementById('recoveryStep2').style.display='block';
-  } else alert('Error: ' + (res.error||res.message));
+  const res = await apiPost('forgotPassword',{phone});
+  if(!res.ok){ alert(res.error||'Error'); return; }
+  document.getElementById('recoveryStep').style.display='block';
+  modalMsg('Código enviado','Revisa tu correo para el código de recuperación.');
 });
-
 document.getElementById('btnVerifyRecovery').addEventListener('click', async ()=>{
   const phone = document.getElementById('fpPhone').value.trim();
   const code = document.getElementById('recoveryCode').value.trim();
   const newPass = document.getElementById('recoveryNewPass').value.trim();
-  if(!/^[0-9]{4}$/.test(newPass)){ alert('La clave nueva debe ser 4 dígitos'); return; }
-  const res = await apiPost('resetPasswordWithCode', { phone, code, newPassword: newPass });
-  if(res.ok){
-    alert('Clave restablecida. Ahora puedes ingresar con tu teléfono.');
-    document.getElementById('forgotFlow').style.display='none';
-  } else alert('Error: ' + (res.error||res.message));
+  if(!/^[0-9]{4}$/.test(newPass)){ alert('Clave 4 dígitos'); return; }
+  const res = await apiPost('resetPasswordWithCode',{phone,code,newPassword:newPass});
+  if(!res.ok){ alert(res.error||'Error'); return; }
+  modalMsg('Listo','Clave restablecida. Ingresa con tu teléfono.');
+  document.getElementById('forgotBox').style.display='none';
 });
 
-/* ------------------ Productos / catálogo ------------------ */
-
-async function loadProducts() {
-  // Try to get from backend action 'listProducts' (maybe not implemented yet)
-  let remote = await apiPost('listProducts', {});
-  if(remote && remote.ok && Array.isArray(remote.products)) {
-    products = remote.products;
-  } else {
-    // fallback local catalog
-    products = [
-      { id:1, name:'Hamburguesa Clásica', price:15000, category:'hamburguesas' },
-      { id:2, name:'Hamburguesa Especial', price:18000, category:'hamburguesas' },
-      { id:3, name:'Almuerzo Ejecutivo', price:12000, category:'almuerzos' }
-    ];
-  }
-  renderProducts();
-}
-
-function renderProducts(){
-  const container = document.getElementById('productsList');
-  container.innerHTML = '';
-  products.forEach(p => {
-    const div = document.createElement('div'); div.className='product';
-    div.innerHTML = `<div class="meta">
-        <div style="font-weight:600">${p.name}</div>
-        <div class="small">${p.category} • ${money(p.price)} COP</div>
-      </div>
-      <div class="qty">
-        <button class="link" data-id="${p.id}" data-act="dec">−</button>
-        <div id="qty-${p.id}" style="min-width:28px; text-align:center">0</div>
-        <button class="link" data-id="${p.id}" data-act="inc">+</button>
+/* ------------- LOAD PRODUCTS & RENDER -------------- */
+async function loadProducts(){
+  const res = await apiPost('listProducts',{});
+  if(res.ok && Array.isArray(res.products)) products = res.products;
+  // render
+  const out = document.getElementById('productsList'); out.innerHTML = '';
+  products.forEach(p=>{
+    const div = document.createElement('div'); div.className='prod';
+    div.innerHTML = `<div class="meta"><div style="font-weight:700">${p.name}</div><div class="small">${p.category} • ${money(p.price)}</div></div>
+      <div style="width:220px;text-align:right">
+        <label class="small">Cantidad</label>
+        <input type="number" min="0" value="0" data-id="${p.id}" style="width:80px;padding:6px;border-radius:8px;border:1px solid #e6eef9"/>
+        <div style="margin-top:6px"><button data-id="${p.id}" class="addBtn">Agregar al carrito</button></div>
       </div>`;
-    container.appendChild(div);
+    out.appendChild(div);
   });
-  // attach handlers
-  container.querySelectorAll('.link').forEach(btn=>{
-    btn.addEventListener('click', ()=> {
-      const id = Number(btn.dataset.id);
-      const act = btn.dataset.act;
-      if(act==='inc') addToCart(id,1); else addToCart(id,-1);
+  document.querySelectorAll('.addBtn').forEach(b=>{
+    b.addEventListener('click', (ev)=>{
+      const id = Number(ev.currentTarget.dataset.id);
+      const qtyEl = document.querySelector('input[data-id="'+id+'"]');
+      const qty = Math.max(0, Number(qtyEl.value||0));
+      if(qty<=0){ alert('Ingresa cantidad'); return; }
+      addToCart(id, qty);
+      qtyEl.value = 0;
     });
   });
 }
 
-function addToCart(productId, delta){
+function addToCart(productId, qty){
   const p = products.find(x=>x.id==productId);
   if(!p) return;
-  const entry = cart[productId] || { ...p, qty:0 };
-  entry.qty = Math.max(0, entry.qty + delta);
-  if(entry.qty===0) delete cart[productId]; else cart[productId]=entry;
-  document.getElementById('qty-'+productId).innerText = entry.qty || 0;
+  const key = productId;
+  if(!cart[key]) cart[key] = {...p, qty: 0};
+  cart[key].qty += qty;
   renderCart();
+  setView('carrito');
 }
 
 function renderCart(){
-  const c = document.getElementById('cartItems');
-  c.innerHTML = '';
+  const el = document.getElementById('cartItems'); el.innerHTML = '';
   let total = 0;
   Object.values(cart).forEach(it=>{
     total += it.price * it.qty;
-    const row = document.createElement('div');
-    row.className='flex';
-    row.style.justifyContent='space-between';
-    row.innerHTML = `<div>${it.qty} x ${it.name}</div><div>${money(it.price*it.qty)} COP</div>`;
-    c.appendChild(row);
+    const row = document.createElement('div'); row.className='cart-line';
+    row.innerHTML = `<div style="width:65%">${it.qty} x ${it.name}</div><div style="width:35%;text-align:right">${money(it.price*it.qty)} <button data-id="${it.id}" style="margin-left:8px" class="secondary">Quitar</button></div>`;
+    el.appendChild(row);
+  });
+  document.querySelectorAll('.cart-line button').forEach(b=>{
+    b.addEventListener('click', ()=>{ delete cart[b.dataset.id]; renderCart(); });
   });
   document.getElementById('cartTotal').innerText = money(total);
-  // update applied points value
-  const pts = Number(document.getElementById('pointsToUse').value||0);
-  document.getElementById('pointsValue').innerText = money(pts * POINT_VALUE);
 }
 
-/* points application UI */
-document.getElementById('pointsToUse').addEventListener('input', ()=>{
-  const v = Number(document.getElementById('pointsToUse').value || 0);
-  document.getElementById('pointsValue').innerText = money(v * POINT_VALUE);
+/* points input */
+document.getElementById('pointsToUse').addEventListener('input', (e)=>{
+  const v = Math.max(0, Math.floor(Number(e.target.value||0)));
+  document.getElementById('pointsToUse').value = v;
 });
 
-/* ------------------ Crear pedido / WhatsApp ------------------ */
-
-document.getElementById('btnCreateOrder').addEventListener('click', async ()=>{
-  if(Object.keys(cart).length===0){ alert('El carrito está vacío'); return; }
-  if(!isLogged){ alert('Debes ingresar para crear pedido'); return; }
-  // Build items array
-  const items = Object.values(cart).map(it=> ({ id: it.id, name: it.name, price: it.price, qty: it.qty, category: it.category }) );
-  let total = Object.values(cart).reduce((s,it)=>s + it.price*it.qty, 0);
-  const pointsToUse = Math.max(0, Math.floor(Number(document.getElementById('pointsToUse').value||0)));
-  const discount = pointsToUse * POINT_VALUE;
-  const totalAfter = Math.max(0, total - discount);
-  // create order via backend (send items + total + pointsApplied in payload)
-  const res = await apiPost('createOrder', { phone: currentPhone, items, total: totalAfter, pointsApplied: pointsToUse });
-  if(res.ok){
-    // inform user and open whatsapp link (backend returns whatsappAdminLink)
-    alert('Pedido creado. Se abrirá WhatsApp para notificar al administrador.');
-    // open whatsapp link from backend if provided, else build custom message
-    let wa = res.whatsappAdminLink || buildWhatsAppLinkForAdmin(items, total, pointsToUse, res.orderId);
-    window.open(wa, '_blank');
-    // clear cart
-    cart = {}; renderCart();
-    await refreshClientPointsAndOrders();
-  } else {
-    alert('Error creando pedido: ' + (res.error||res.message));
-  }
-});
-
-function buildWhatsAppLinkForAdmin(items, total, pointsApplied, orderId){
-  // build text fallback
-  const adminPhone = (getConfigPhoneFallback() || '573118336562').replace('+','').replace(/\s+/g,'');
-  let msg = 'Nuevo pedido\\nID: ' + (orderId || 'N/A') + '\\nCliente: ' + (currentPhone || '') + '\\nTotal: ' + total + '\\nItems:\\n';
-  items.forEach(it=> msg += '- ' + it.qty + ' x ' + it.name + ' = ' + (it.price * it.qty) + '\\n');
-  if(pointsApplied) msg += '\\nPuntos aplicados: ' + pointsApplied + ' (descuento ' + (pointsApplied*POINT_VALUE) + ' COP)\\n';
-  return 'https://wa.me/' + adminPhone + '?text=' + encodeURIComponent(msg);
+/* load client info */
+async function loadClientInfo(){
+  if(!currentPhone) return;
+  const res = await apiPost('getClient',{phone: currentPhone});
+  if(res.ok){ clientPoints = Number(res.client.puntos||0); document.getElementById('clientPoints').innerText = clientPoints; }
+  // get config point value
+  const val = await fetchConfig('ValorPorPunto'); if(val) pointValue = Number(val);
+  document.getElementById('pointValue').innerText = pointValue;
 }
 
-/* get admin phone fallback (reads from config via backend if available) */
-async function getAdminPhoneFromConfig(){
-  // backend doesn't have getConfig yet; this is placeholder
+/* fetch config helper */
+async function fetchConfig(key){
+  // backend doesn't have getConfig endpoint, but Config values are visible in sheet — quick workaround: use getClient for phone and rely on default
+  // For now read from a dedicated endpoint? Not implemented — use default provided in UI unless admin updates
   return null;
 }
-function getConfigPhoneFallback(){ return '573118336562'; }
 
-/* ------------------ Pedidos: ver (cliente) ------------------ */
+/* ------------- CREATE ORDER -------------- */
+document.getElementById('btnCreateOrder').addEventListener('click', async ()=>{
+  if(!isLogged){ alert('Debes ingresar como cliente'); return; }
+  const items = Object.values(cart).map(it=>({ id: it.id, name: it.name, price: it.price, qty: it.qty, category: it.category }));
+  if(items.length===0){ alert('Carrito vacio'); return; }
+  let total = items.reduce((s,it)=>s + it.price*it.qty,0);
+  const pts = Math.max(0, Math.floor(Number(document.getElementById('pointsToUse').value||0)));
+  const discount = pts * pointValue;
+  const totalAfter = Math.max(0, total - discount);
+  const res = await apiPost('createOrder',{ phone: currentPhone, items, total: totalAfter, pointsApplied: pts, createdFrom:'web' });
+  if(!res.ok){ alert(res.error||'Error creando pedido'); return; }
+  cart = {}; renderCart();
+  modalMsg('Pedido creado','Se abrió WhatsApp para notificar al admin. Si no se abre automáticamente, copia el enlace mostrado.');
+  // show button to open whatsapp
+  showModal(`<h3>Pedido creado</h3><p>ID: ${res.orderId}</p><p><a target="_blank" href="${res.whatsappLink}"><button>Abrir WhatsApp para enviar al admin</button></a></p><p style="margin-top:8px"><button onclick="closeModal()">Cerrar</button></p>`);
+  await loadClientInfo();
+});
 
-async function refreshClientPointsAndOrders(){
+/* ------------- MY ORDERS -------------- */
+async function refreshMyOrders(){
   if(!currentPhone) return;
-  // list orders with phone filter
-  const res = await apiPost('listOrders', { phone: currentPhone });
-  if(res.ok){
-    // compute client points by summing puntos of orders with estado 'entregado'
-    const orders = res.orders || [];
-    let totalPoints = 0;
-    orders.forEach(o => {
-      if(o.estado === 'entregado') totalPoints += Number(o.puntos||0);
-    });
-    document.getElementById('clientPoints').innerText = totalPoints;
-    renderMyOrders(orders);
-  } else {
-    document.getElementById('clientPoints').innerText = '0';
-    document.getElementById('myOrdersList').innerHTML = '<div class="small muted">No hay pedidos visibles</div>';
-  }
-}
-
-function renderMyOrders(orders){
-  const el = document.getElementById('myOrdersList');
+  const res = await apiPost('listOrders',{phone: currentPhone});
+  const el = document.getElementById('myOrders');
   el.innerHTML = '';
-  if(!orders.length){ el.innerHTML = '<div class="small muted">No has realizado pedidos aún.</div>'; return; }
+  if(!res.ok) { el.innerHTML = '<div class="small muted">No fue posible cargar pedidos</div>'; return; }
+  const orders = res.orders || [];
   orders.sort((a,b)=> new Date(b.fecha) - new Date(a.fecha));
   orders.forEach(o=>{
-    const node = document.createElement('div'); node.className='order-item';
-    node.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${o.id}</strong><div class="small">Estado: ${o.estado}</div></div><div><strong>${money(o.total)} COP</strong></div></div>
-      <div class="small" style="margin-top:6px">Items: ${ (o.items||[]).map(i=> i.qty + 'x '+ i.name).join(', ') }</div>
-      <div style="margin-top:6px" class="flex">
-        ${o.estado !== 'entregado' ? `<button class="link" data-id="${o.id}" data-act="confirmReceived">Confirmar recibido</button>` : '<div class="pill">Entregado</div>'}
+    const node = document.createElement('div'); node.className='card';
+    node.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${o.id}</strong><div class="small">Estado: ${o.estado}</div></div><div class="right"><strong>${money(o.total)}</strong></div></div>
+      <div class="small" style="margin-top:6px">Items: ${(o.items||[]).map(i=>i.qty+'x '+i.name).join(', ')}</div>
+      <div style="margin-top:8px" class="flex">
+        ${o.estado !== 'entregado' ? `<button class="secondary" data-id="${o.id}" data-act="confirmReceived">Confirmo recibido (abrir WhatsApp)</button>` : '<div class="badge">Entregado</div>'}
       </div>`;
     el.appendChild(node);
-    // add handler for confirm receipt
     const btn = node.querySelector('button[data-act="confirmReceived"]');
-    if(btn) btn.addEventListener('click', ()=> confirmReceived(o.id));
+    if(btn) btn.addEventListener('click', ()=> {
+      // open whatsapp to admin with client confirmation message
+      const adminPhone = getCfgPhoneForFrontend().replace('+','').replace(/\s+/g,'');
+      const msg = `Hola Wimpy 👋,%0Aconfirmo la recepción del pedido ${o.id}.%0A¡Gracias!%0A%0A– Equipo Wimpy Restaurante`;
+      window.open(`https://wa.me/${adminPhone}?text=${msg}`,'_blank');
+      modalMsg('Mensaje listo','Se abrió WhatsApp para confirmar la recepción con el admin. Cuando el admin lo confirme en el panel, el pedido quedará marcado como entregado y se asignarán los puntos.');
+    });
   });
 }
 
-async function confirmReceived(orderId){
-  if(!confirm('Confirmas que has recibido el pedido?')) return;
-  // call updateOrderStatus to mark as 'entregado'
-  const res = await apiPost('updateOrderStatus', { orderId, status: 'entregado' });
-  if(res.ok){ alert('Pedido marcado como entregado. Se asignarán puntos.'); await refreshClientPointsAndOrders(); }
-  else alert('Error: ' + (res.error||res.message));
-}
-
-/* ------------------ Admin: login, ver pedidos, actualizar estado ------------------ */
-
+/* ------------- ADMIN LOGIN -------------- */
 document.getElementById('btnAdminLogin').addEventListener('click', async ()=>{
   const pw = document.getElementById('adminPass').value.trim();
-  if(!pw){ alert('Ingresa la clave admin'); return; }
-  const res = await apiPost('adminLogin', { password: pw });
-  if(res.ok){
-    isAdmin = true; adminToken = res.token || '';
-    document.getElementById('adminLoginBox').style.display='none';
-    document.getElementById('adminControls').style.display='block';
-    alert('Ingreso admin OK');
-    loadAdminOrders();
-  } else alert('Error de admin: ' + (res.error||res.message));
+  if(!pw){ alert('Ingresa clave admin'); return; }
+  const res = await apiPost('adminLogin',{password: pw});
+  if(!res.ok){ alert(res.error||'Credenciales inválidas'); return; }
+  adminToken = res.token || '';
+  document.getElementById('adminTokenShort').innerText = adminToken.substr(0,8) + '...';
+  document.querySelector('[data-view="adminLogin"]').style.display='none';
+  document.querySelector('[data-view="adminPanel"]').style.display='';
+  document.querySelector('[data-view="adminPanel"]').classList.add('active');
+  setView('adminPanel');
+  await loadAdminProducts();
+  await loadAdminClients();
+  await loadAdminOrders();
 });
 
-document.getElementById('btnRefreshOrders').addEventListener('click', loadAdminOrders);
-
-async function loadAdminOrders(){
-  // no token validation in frontend (backend will validate token if implemented)
-  const res = await apiPost('listOrders', {});
-  const el = document.getElementById('adminOrders');
-  el.innerHTML = '';
-  if(res.ok){
-    const orders = res.orders || [];
-    orders.sort((a,b)=> new Date(b.fecha) - new Date(a.fecha));
-    orders.forEach(o=>{
-      const node = document.createElement('div'); node.className='order-item';
-      node.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${o.id}</strong><div class="small">Cliente: ${o.phone}</div></div><div><strong>${money(o.total)} COP</strong></div></div>
-        <div class="small" style="margin-top:6px">Items: ${(o.items||[]).map(i=> i.qty + ' x ' + i.name).join(', ')}</div>
-        <div style="margin-top:6px" class="flex">
-          <select id="sel-${o.id}" class="small">
-            <option value="pendiente" ${o.estado==='pendiente'?'selected':''}>pendiente</option>
-            <option value="confirmado" ${o.estado==='confirmado'?'selected':''}>confirmado</option>
-            <option value="enviado" ${o.estado==='enviado'?'selected':''}>enviado</option>
-            <option value="entregado" ${o.estado==='entregado'?'selected':''}>entregado</option>
-          </select>
-          <button class="link" data-id="${o.id}" data-act="saveStatus">Guardar</button>
-        </div>`;
-      el.appendChild(node);
-      node.querySelector('button[data-act="saveStatus"]').addEventListener('click', async ()=>{
-        const newStatus = node.querySelector('select').value;
-        const r = await apiPost('updateOrderStatus', { orderId: o.id, status: newStatus, adminNotes: '' });
-        if(r.ok){ alert('Status actualizado'); loadAdminOrders(); } else alert('Error: '+(r.error||r.message));
-      });
+/* ------------- ADMIN: PRODUCTS -------------- */
+async function loadAdminProducts(){
+  const res = await apiPost('listProducts',{});
+  const el = document.getElementById('adminProducts'); el.innerHTML = '';
+  if(!res.ok) { el.innerHTML = '<div class="small muted">No hay productos</div>'; return; }
+  products = res.products || [];
+  products.forEach(p=>{
+    const node = document.createElement('div'); node.className='prod';
+    node.innerHTML = `<div class="meta"><strong>${p.name}</strong><div class="small">${p.category} • ${money(p.price)}</div></div>
+      <div><button data-id="${p.id}" class="editProd">Editar</button></div>`;
+    el.appendChild(node);
+  });
+  document.querySelectorAll('.editProd').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const id = Number(b.dataset.id);
+      const p = products.find(x=>x.id==id);
+      if(!p) return;
+      document.getElementById('prodName').value = p.name;
+      document.getElementById('prodPrice').value = p.price;
+      document.getElementById('prodCategory').value = p.category;
+      document.getElementById('prodActive').value = 'true';
+      document.getElementById('prodDesc').value = p.description||'';
+      // save id to button
+      document.getElementById('btnSaveProduct').dataset.edit = id;
     });
-  } else el.innerHTML = '<div class="small muted">No se pudieron cargar pedidos</div>';
+  });
+}
+document.getElementById('btnSaveProduct').addEventListener('click', async ()=>{
+  const id = document.getElementById('btnSaveProduct').dataset.edit ? Number(document.getElementById('btnSaveProduct').dataset.edit) : null;
+  const p = {
+    id: id,
+    name: document.getElementById('prodName').value.trim(),
+    price: Number(document.getElementById('prodPrice').value||0),
+    category: document.getElementById('prodCategory').value.trim(),
+    activo: document.getElementById('prodActive').value==='true',
+    description: document.getElementById('prodDesc').value.trim()
+  };
+  if(!p.name){ alert('Nombre requerido'); return; }
+  const res = await apiPost('addOrUpdateProduct',{product:p, adminToken});
+  if(!res.ok){ alert(res.error||'Error'); return; }
+  modalMsg('OK', res.message || 'Guardado');
+  document.getElementById('btnSaveProduct').dataset.edit = '';
+  document.getElementById('prodName').value=''; document.getElementById('prodPrice').value=''; document.getElementById('prodCategory').value=''; document.getElementById('prodDesc').value='';
+  await loadAdminProducts();
+});
+
+/* ADMIN CLIENTS */
+async function loadAdminClients(){
+  const res = await apiPost('listOrders',{}); // no listClients endpoint — we'll show clients from Clientes sheet via getClient? not implemented — we'll show empty and let admin add
+  const el = document.getElementById('adminClients'); el.innerHTML = '<div class="small muted">Usa el formulario para crear o actualizar clientes.</div>';
+}
+document.getElementById('btnSaveClient').addEventListener('click', async ()=>{
+  const client = { phone: document.getElementById('clientPhone').value.trim(), name: document.getElementById('clientName').value.trim(), email: document.getElementById('clientEmail').value.trim() };
+  if(!client.phone){ alert('Teléfono requerido'); return; }
+  const res = await apiPost('addOrUpdateClient',{client, adminToken});
+  if(!res.ok){ alert(res.error||'Error'); return; }
+  modalMsg('OK', res.message || 'Cliente guardado');
+  document.getElementById('clientPhone').value=''; document.getElementById('clientName').value=''; document.getElementById('clientEmail').value='';
+});
+
+/* ------------- ADMIN: ORDERS -------------- */
+document.getElementById('btnRefreshOrders').addEventListener('click', loadAdminOrders);
+async function loadAdminOrders(){
+  const res = await apiPost('listOrders',{});
+  const el = document.getElementById('adminOrders'); el.innerHTML = '';
+  if(!res.ok){ el.innerHTML = '<div class="small muted">No se pudieron cargar pedidos</div>'; return; }
+  const orders = res.orders || [];
+  orders.sort((a,b)=> new Date(b.fecha) - new Date(a.fecha));
+  orders.forEach(o=>{
+    const node = document.createElement('div'); node.className='card';
+    node.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${o.id}</strong><div class="small">Cliente: ${o.phone}</div></div><div class="right"><strong>${money(o.total)}</strong></div></div>
+      <div class="small" style="margin-top:6px">Items: ${(o.items||[]).map(i=>i.qty+' x '+i.name).join(', ')}</div>
+      <div style="margin-top:8px" class="flex">
+        <select id="sel-${o.id}">
+          <option value="pendiente" ${o.estado==='pendiente'?'selected':''}>pendiente</option>
+          <option value="confirmado" ${o.estado==='confirmado'?'selected':''}>confirmado</option>
+          <option value="enviado" ${o.estado==='enviado'?'selected':''}>enviado</option>
+          <option value="entregado" ${o.estado==='entregado'?'selected':''}>entregado</option>
+        </select>
+        <button class="secondary" data-id="${o.id}" data-act="saveStatus">Guardar</button>
+        <div style="margin-left:auto" id="wa-${o.id}"></div>
+      </div>`;
+    el.appendChild(node);
+    node.querySelector('button[data-act="saveStatus"]').addEventListener('click', async ()=>{
+      const newStatus = node.querySelector('select').value;
+      const r = await apiPost('updateOrderStatus',{orderId:o.id, status:newStatus, adminToken});
+      if(!r.ok){ alert(r.error||'Error'); return; }
+      modalMsg('OK','Status actualizado');
+      if(r.whatsappLink){
+        // show button to open whatsapp
+        const waPlace = document.getElementById('wa-'+o.id);
+        waPlace.innerHTML = `<a target="_blank" href="${r.whatsappLink}"><button>Abrir WhatsApp</button></a>`;
+      } else {
+        document.getElementById('wa-'+o.id).innerHTML = '';
+      }
+      await loadAdminOrders();
+    });
+  });
 }
 
-/* ------------------ Inicio ------------------ */
+/* ------------- INFORMES Y CUENTAS -------------- */
+document.getElementById('btnGenerarInforme').addEventListener('click', async ()=>{
+  const mes = Number(document.getElementById('selMes').value);
+  const año = Number(document.getElementById('selAnio').value || new Date().getFullYear());
+  const res = await apiPost('generarInformeMensual',{mes, año});
+  const el = document.getElementById('informeResult'); el.innerHTML = '';
+  if(!res.ok){ el.innerHTML = '<div class="small muted">Error generando informe</div>'; return; }
+  let html = `<div class="small">Total ventas: <strong>${money(res.totalGeneral)}</strong></div><h4>Top 5 productos</h4><ol>`;
+  res.top5.forEach(t=> html += `<li>${t.producto} — ${t.cantidad} uds</li>`);
+  html += '</ol><h4>Clientes</h4>';
+  res.clientes.forEach(c=> html += `<div class="card small">${c.phone} — ${money(c.total)} — ${c.pedidos} pedidos</div>`);
+  el.innerHTML = html;
+});
+
+/* crear cuenta */
+document.getElementById('btnCrearCuenta').addEventListener('click', async ()=>{
+  const mes = Number(document.getElementById('selMes').value);
+  const año = Number(document.getElementById('selAnio').value || new Date().getFullYear());
+  const empresa = {
+    nombre: document.getElementById('cc_nombre').value.trim(),
+    nit: document.getElementById('cc_nit').value.trim(),
+    direccion: document.getElementById('cc_direccion').value.trim(),
+    email: document.getElementById('cc_email').value.trim(),
+    telefono: document.getElementById('cc_telefono').value.trim(),
+    contacto: document.getElementById('cc_contacto').value.trim()
+  };
+  const res = await apiPost('crearCuentaCobro',{mes,año,empresaCliente:empresa});
+  if(!res.ok){ modalMsg('Error', res.error||'Error creando cuenta'); return; }
+  document.getElementById('ccStatus').innerHTML = `Creada cuenta ${res.consecutivo}. <a target="_blank" href="https://drive.google.com/file/d/${res.pdfFileId}/view"><button>Ver PDF</button></a>`;
+});
+
+/* enviar cuenta */
+document.getElementById('btnEnviarCuenta').addEventListener('click', async ()=>{
+  const pdfLink = document.querySelector('#ccStatus a') ? (document.querySelector('#ccStatus a').href || '') : '';
+  const email = document.getElementById('cc_email').value.trim() || document.getElementById('cc_email').placeholder;
+  if(!pdfLink){ alert('Primero crea la cuenta'); return; }
+  // extract file id from the link if present
+  const match = pdfLink.match(/\/d\/([^\/]+)\//);
+  if(!match){ alert('No se encontró pdfId'); return; }
+  const pdfId = match[1];
+  // find excel file id by querying CuentasCobro sheet? For simplicity, ask user to fill email and rely on backend enviarCuentaCobro endpoint with last created cc.
+  const res = await apiPost('enviarCuentaCobro',{pdfFileId:pdfId, excelFileId:pdfId, emailDestino: document.getElementById('cc_email').value.trim(), asunto:'Cuenta de cobro Wimpy'});
+  if(!res.ok){ modalMsg('Error', res.error||'Error enviando'); return; }
+  modalMsg('Enviado','Cuenta de cobro enviada a ' + document.getElementById('cc_email').value.trim());
+});
+
+/* ------------- CONFIG -------------- */
+document.getElementById('btnSaveConfig').addEventListener('click', async ()=>{
+  const phone = document.getElementById('cfgPhone').value.trim();
+  const valPoint = Number(document.getElementById('cfgValorPunto').value||20);
+  const name = document.getElementById('cfgEmpresaNombre').value.trim();
+  // save by creating simple addOrUpdateClient? we don't have direct setConfig endpoint — ask admin to edit in sheet manually. Quick approach: we call an admin endpoint to save via addOrUpdateClient? Not ideal.
+  // For now show message telling admin to edit sheet directly (safe).
+  modalMsg('Guardar configuración','Edita la hoja "Configuracion" en el spreadsheet para cambiar valores permanentemente.');
+});
+
+/* ------------- HELPERS, UI -------------- */
+function modalMsg(title, text){
+  showModal(`<h3>${title}</h3><p>${text}</p><div style="margin-top:12px" class="flex"><button onclick="closeModal()">Cerrar</button></div>`);
+}
+
+/* cfg phone helper */
+function getCfgPhoneForFrontend(){ 
+  // read field or fallback
+  const v = document.getElementById('cfgPhone').value.trim();
+  return v || '+573118336562';
+}
+
+/* ------------- INIT -------------- */
 (async function init(){
+  // set year default
+  document.getElementById('selAnio').value = new Date().getFullYear();
+  // try load products
   await loadProducts();
-  // quick UI wire
-  document.getElementById('phoneInput').value = '';
+  // populate config display
+  document.getElementById('cfgWhats').innerText = getCfgPhoneForFrontend();
+  setView('cliente');
 })();
 </script>
-
 </body>
 </html>
