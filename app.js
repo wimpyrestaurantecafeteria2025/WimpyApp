@@ -2,7 +2,7 @@
 // CONFIGURACIÓN Y VARIABLES GLOBALES
 // ========================================
 
-const API_URL = ''https://script.google.com/macros/s/AKfycby-CT0YBSE2n3Iy6Pf5XTFbpJZGSx1en6FWKdENXjVR9GflsCnzgTS08Kb9iw5ydBq1/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycby-CT0YBSE2n3Iy6Pf5XTFbpJZGSx1en6FWKdENXjVR9GflsCnzgTS08Kb9iw5ydBq1/exec';
 const STORAGE_KEY = 'wimpyapp_user';
 const ADMIN_SESSION_KEY = 'wimpyapp_admin_session';
 const CART_KEY = 'wimpyapp_cart';
