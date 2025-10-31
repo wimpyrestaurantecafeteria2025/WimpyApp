@@ -6,7 +6,9 @@
     <title>WimpyApp - Gestión de Pedidos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <?!= include('styles') ?> 
+    <style>
+        <?!= include('STYLE') ?> 
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -34,299 +36,246 @@
                 </div>
             </div>
         </div>
+
         <div id="clientLoginScreen" class="screen">
-            <div class="client-login-container">
-                <div class="header">
-                    <button class="back-btn" onclick="goHome()">
-                        <i class="fas fa-arrow-left"></i>
+            <div class="auth-container">
+                <h2 class="text-primary">Iniciar Sesión (Cliente)</h2>
+                <form id="clientLoginForm">
+                    <div class="form-group">
+                        <label for="clientPhone">Teléfono</label>
+                        <input type="tel" id="clientPhone" placeholder="Ej: 3001234567" required>
+                    </div>
+                    <div class="form-group password-group hidden" id="passwordGroup">
+                        <label for="clientPassword">Contraseña</label>
+                        <input type="password" id="clientPassword" placeholder="Tu Contraseña">
+                        <a href="#" class="forgot-password" onclick="handleForgotPassword(event)">¿Olvidaste la Contraseña?</a>
+                    </div>
+                    <div class="form-group pin-group hidden" id="pinGroup">
+                        <label for="clientPin">PIN de Verificación</label>
+                        <input type="number" id="clientPin" placeholder="Ej: 123456" minlength="6" maxlength="6">
+                        <a href="#" class="resend-pin" onclick="resendPin(event)">Reenviar PIN</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-sign-in-alt"></i> Continuar
                     </button>
-                    <h2>Acceso Clientes</h2>
-                </div>
-                <form id="clientLoginForm" onsubmit="handleClientLogin(event)">
-                    <div id="clientLoginStep1">
-                        <p>Ingresa tu número de teléfono para empezar.</p>
-                        <div class="form-group">
-                            <label for="clientPhone">Teléfono</label>
-                            <input type="tel" id="clientPhone" placeholder="3001234567" required>
-                        </div>
-                        <button class="btn btn-primary btn-full-width" type="submit">
-                            <i class="fas fa-arrow-right"></i> Continuar
-                        </button>
-                    </div>
-                    <div id="clientLoginStep2" style="display: none;">
-                        <p id="clientLoginMessage"></p>
-                        <div class="form-group password-group">
-                            <label for="clientPassword">Contraseña</label>
-                            <input type="password" id="clientPassword" placeholder="********" required>
-                            <button type="button" class="forgot-password" onclick="handleForgotPassword()">
-                                ¿Olvidaste la contraseña?
-                            </button>
-                        </div>
-                        <button class="btn btn-primary btn-full-width" type="submit">
-                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                        </button>
-                    </div>
-                    <div id="clientLoginStep3" style="display: none;">
-                        <p>Verificación de PIN enviada a tu email.</p>
-                        <div class="form-group">
-                            <label for="clientPin">PIN</label>
-                            <input type="number" id="clientPin" placeholder="XXXXXX" required>
-                        </div>
-                        <button class="btn btn-primary btn-full-width" onclick="handleVerifyPin(event)">
-                            <i class="fas fa-check"></i> Verificar PIN
-                        </button>
-                        <button type="button" class="btn btn-link mt-16" onclick="resendPin()">
-                            Reenviar PIN
-                        </button>
-                    </div>
-                    <div id="clientLoginStep4" style="display: none;">
-                        <p>Establece una nueva contraseña.</p>
-                        <div class="form-group">
-                            <label for="newClientPassword">Nueva Contraseña</label>
-                            <input type="password" id="newClientPassword" placeholder="********" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmClientPassword">Confirmar Contraseña</label>
-                            <input type="password" id="confirmClientPassword" placeholder="********" required>
-                        </div>
-                        <button class="btn btn-primary btn-full-width" onclick="handleCreatePassword(event)">
-                            <i class="fas fa-lock"></i> Establecer Contraseña
-                        </button>
-                    </div>
+                    <button type="button" class="btn btn-secondary btn-block mt-16" onclick="goHome()">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
                 </form>
             </div>
         </div>
 
         <div id="adminLoginScreen" class="screen">
-            <div class="admin-login-container">
-                <div class="header">
-                    <button class="back-btn" onclick="goHome()">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h2>Acceso Administrador</h2>
-                </div>
-                <form onsubmit="handleAdminLogin(event)">
-                    <p>Ingresa la contraseña de administrador.</p>
+            <div class="auth-container">
+                <h2 class="text-secondary">Acceso Administrador</h2>
+                <form id="adminLoginForm">
                     <div class="form-group">
-                        <label for="adminPassword">Contraseña</label>
-                        <input type="password" id="adminPassword" placeholder="********" required>
+                        <label for="adminPassword">Contraseña de Administrador</label>
+                        <input type="password" id="adminPassword" placeholder="Contraseña Maestra" required>
                     </div>
-                    <button class="btn btn-primary btn-full-width" type="submit">
-                        <i class="fas fa-lock-open"></i> Iniciar Sesión
+                    <button type="submit" class="btn btn-admin btn-block">
+                        <i class="fas fa-lock-open"></i> Acceder
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-block mt-16" onclick="goHome()">
+                        <i class="fas fa-arrow-left"></i> Volver
                     </button>
                 </form>
             </div>
         </div>
 
         <div id="clientDashboardScreen" class="screen">
-            <div class="dashboard-header">
-                <div class="welcome-message">
-                    <p>Bienvenido,</p>
-                    <h2 id="clientNameDisplay">Cliente</h2>
+            <header class="header">
+                <div class="logo">
+                    <i class="fas fa-utensils"></i> WimpyApp
                 </div>
-                <div class="client-actions">
+                <div class="user-info">
+                    <span id="clientEmailDisplay"></span>
                     <button class="btn btn-danger btn-sm" onclick="handleClientLogout()">
-                        <i class="fas fa-sign-out-alt"></i> Salir
+                        <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
-            </div>
+            </header>
+            <nav class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="clientOrdersTab" onclick="switchClientTab('clientOrdersTab')">
+                    <i class="fas fa-list-alt"></i> Pedidos
+                </button>
+                <button class="tab-btn" data-tab="clientMenuTab" onclick="switchClientTab('clientMenuTab')">
+                    <i class="fas fa-pizza-slice"></i> Menú
+                </button>
+                <button class="tab-btn" data-tab="clientPointsTab" onclick="switchClientTab('clientPointsTab')">
+                    <i class="fas fa-coins"></i> Puntos (<span id="clientPointsCount">0</span>)
+                </button>
+            </nav>
 
-            <div class="dashboard-tabs">
-                <button class="tab-btn active" data-tab="clientProducts" onclick="switchClientTab('clientProducts')">
-                    <i class="fas fa-coffee"></i> Productos
-                </button>
-                <button class="tab-btn" data-tab="clientOrders" onclick="switchClientTab('clientOrders')">
-                    <i class="fas fa-receipt"></i> Pedidos
-                </button>
-                <button class="tab-btn" data-tab="clientPoints" onclick="switchClientTab('clientPoints')">
-                    <i class="fas fa-star"></i> Puntos
-                </button>
-            </div>
+            <main class="dashboard-content">
+                <section id="clientOrdersTab" class="tab-content active">
+                    <h3 class="section-title">Mis Pedidos Recientes</h3>
+                    <div id="clientOrdersList" class="orders-list">
+                        </div>
+                </section>
 
-            <div id="clientDashboardContent">
-                <div id="clientProducts" class="tab-content active">
-                    <div class="section-header">
-                        <h3>Menú</h3>
-                        <div class="search-box">
-                            <input type="text" id="productSearch" placeholder="Buscar producto..." onkeyup="handleSearch(this.value, 'products')">
-                            <i class="fas fa-search"></i>
+                <section id="clientMenuTab" class="tab-content">
+                    <h3 class="section-title">Menú y Pedidos</h3>
+                    
+                    <div class="menu-layout">
+                        <div class="menu-section">
+                            <div class="search-box">
+                                <input type="text" id="productSearchClient" placeholder="Buscar producto..." oninput="handleSearch(this.value, 'client')">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div id="productsGrid" class="products-grid mt-16">
+                                </div>
+                        </div>
+
+                        <div class="cart-section">
+                            <h4><i class="fas fa-shopping-cart"></i> Tu Pedido</h4>
+                            <div id="cartList" class="cart-list">
+                                <p class="text-muted text-center">Tu carrito está vacío.</p>
+                            </div>
+                            <div class="cart-summary">
+                                <div>Total: <span id="cartTotal">$0</span></div>
+                                <div>Puntos a Usar: <span id="pointsDiscountDisplay">0</span></div>
+                                <div>Total Final: <span id="cartFinalTotal">$0</span></div>
+                            </div>
+                            <div class="form-group mt-16">
+                                <label for="pointsInput">Usar Puntos Disponibles (<span id="availablePoints">0</span>):</label>
+                                <input type="number" id="pointsInput" min="0" value="0" oninput="calculatePointsDiscount(this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label for="orderNotes">Notas del Pedido:</label>
+                                <textarea id="orderNotes" rows="2" placeholder="Ej: Sin cebolla, recoger a las 2pm."></textarea>
+                            </div>
+                            <button class="btn btn-primary btn-block" onclick="openOrderConfirmModal()">
+                                <i class="fas fa-paper-plane"></i> Enviar Pedido
+                            </button>
                         </div>
                     </div>
-                    <div id="productsGrid" class="products-grid">
-                        <p class="text-secondary">Cargando productos...</p>
-                    </div>
-                </div>
+                </section>
 
-                <div id="clientOrders" class="tab-content">
-                    <div class="section-header">
-                        <h3>Mi Historial de Pedidos</h3>
+                <section id="clientPointsTab" class="tab-content">
+                    <h3 class="section-title">Historial de Puntos</h3>
+                    <div class="info-card primary">
+                        Puntos Acumulados: <span id="totalPointsDisplay">0</span>
                     </div>
-                    <div id="ordersList" class="data-list">
-                        <p class="text-secondary">Cargando pedidos...</p>
+                    <div id="pointsHistoryList" class="list-container mt-16">
+                        <p class="text-muted text-center">No hay historial de puntos.</p>
                     </div>
-                </div>
-
-                <div id="clientPoints" class="tab-content">
-                    <div class="section-header">
-                        <h3>Programa de Puntos</h3>
-                    </div>
-                    <div class="points-card">
-                        <p>Total de Puntos Acumulados</p>
-                        <div class="points-display">
-                            <i class="fas fa-star"></i>
-                            <span id="currentPointsDisplay">0</span>
-                        </div>
-                        <p class="text-secondary">Cada punto equivale a <span id="pointsRateDisplay">1</span> COP de descuento.</p>
-                    </div>
-
-                    <h4 class="mt-16">Historial de Transacciones</h4>
-                    <div id="pointsHistory" class="data-list">
-                        <p class="text-secondary">Cargando historial...</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="cartWidget" class="cart-widget">
-                <div class="cart-header" onclick="toggleCart()">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Ver Carrito (<span id="cartCount">0</span>)</span>
-                    <span id="cartTotalDisplay" class="cart-total-price">$0</span>
-                </div>
-                <div id="cartDetails" class="cart-details-container">
-                    <div id="cartItemsList" class="cart-items-list">
-                        <p class="text-secondary text-center">El carrito está vacío.</p>
-                    </div>
-                    <div class="cart-footer">
-                        <button class="btn btn-primary btn-full-width" onclick="openOrderConfirmModal()">
-                            <i class="fas fa-check-circle"></i> Confirmar Pedido
-                        </button>
-                    </div>
-                </div>
-            </div>
+                </section>
+            </main>
         </div>
 
         <div id="adminDashboardScreen" class="screen">
-            <div class="dashboard-header">
-                <div class="welcome-message">
-                    <p>Panel de Control</p>
-                    <h2>Administrador</h2>
+            <header class="header admin-header">
+                <div class="logo">
+                    <i class="fas fa-lock"></i> Administrador
                 </div>
-                <div class="admin-actions">
+                <div class="user-info">
                     <button class="btn btn-danger btn-sm" onclick="handleAdminLogout()">
                         <i class="fas fa-sign-out-alt"></i> Salir
                     </button>
                 </div>
-            </div>
-
-            <div class="dashboard-tabs">
-                <button class="tab-btn active" data-tab="adminOrders" onclick="switchAdminTab('adminOrders')">
-                    <i class="fas fa-receipt"></i> Pedidos
+            </header>
+            <nav class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="adminOrdersTab" onclick="switchAdminTab('adminOrdersTab')">
+                    <i class="fas fa-clipboard-list"></i> Pedidos
                 </button>
-                <button class="tab-btn" data-tab="adminProducts" onclick="switchAdminTab('adminProducts')">
-                    <i class="fas fa-box"></i> Productos
+                <button class="tab-btn" data-tab="adminProductsTab" onclick="switchAdminTab('adminProductsTab')">
+                    <i class="fas fa-box-open"></i> Productos
                 </button>
-                <button class="tab-btn" data-tab="adminClients" onclick="switchAdminTab('adminClients')">
-                    <i class="fas fa-users"></i> Clientes
+                <button class="tab-btn" data-tab="adminClientsTab" onclick="switchAdminTab('adminClientsTab')">
+                    <i class="fas fa-user-tag"></i> Clientes
                 </button>
-                <button class="tab-btn" data-tab="adminEnterprises" onclick="switchAdminTab('adminEnterprises')">
+                <button class="tab-btn" data-tab="adminEnterpriseTab" onclick="switchAdminTab('adminEnterpriseTab')">
                     <i class="fas fa-building"></i> Empresas
                 </button>
-                <button class="tab-btn" data-tab="adminConfig" onclick="switchAdminTab('adminConfig')">
-                    <i class="fas fa-cog"></i> Configuración
+                <button class="tab-btn" data-tab="adminSettingsTab" onclick="switchAdminTab('adminSettingsTab')">
+                    <i class="fas fa-cog"></i> Config
                 </button>
-            </div>
+            </nav>
 
-            <div id="adminDashboardContent">
-                
-                <div id="adminOrders" class="tab-content active">
-                    <div class="section-header">
-                        <h3>Pedidos Pendientes</h3>
-                        <div class="search-box">
-                            <input type="text" id="adminOrderSearch" placeholder="Buscar pedido o cliente..." onkeyup="handleSearch(this.value, 'adminOrders')">
-                            <i class="fas fa-search"></i>
+            <main class="dashboard-content">
+                <section id="adminOrdersTab" class="tab-content active">
+                    <h3 class="section-title">Gestión de Pedidos</h3>
+                    <div id="adminOrdersList" class="list-container">
                         </div>
-                    </div>
-                    <div id="adminOrdersList" class="data-list">
-                        <p class="text-secondary">Cargando pedidos...</p>
-                    </div>
-                </div>
+                </section>
 
-                <div id="adminProducts" class="tab-content">
+                <section id="adminProductsTab" class="tab-content">
                     <div class="section-header">
-                        <h3>Gestión de Productos</h3>
-                        <button class="btn btn-primary btn-sm" onclick="openCreateProductModal()">
+                        <h3 class="section-title">Gestión de Productos</h3>
+                        <button class="btn btn-success" onclick="openCreateProductModal()">
                             <i class="fas fa-plus"></i> Nuevo Producto
                         </button>
                     </div>
-                    <div id="adminProductsGrid" class="data-grid-list">
-                        <p class="text-secondary">Cargando productos...</p>
+                    <div class="search-box mt-16">
+                        <input type="text" id="productSearchAdmin" placeholder="Buscar producto..." oninput="handleSearch(this.value, 'admin')">
+                        <i class="fas fa-search"></i>
                     </div>
-                </div>
+                    <div id="adminProductsList" class="list-container mt-16">
+                        </div>
+                </section>
 
-                <div id="adminClients" class="tab-content">
+                <section id="adminClientsTab" class="tab-content">
                     <div class="section-header">
-                        <h3>Gestión de Clientes</h3>
-                        <button class="btn btn-primary btn-sm" onclick="openCreateClientModal()">
+                        <h3 class="section-title">Gestión de Clientes</h3>
+                        <button class="btn btn-success" onclick="openCreateClientModal()">
                             <i class="fas fa-user-plus"></i> Nuevo Cliente
                         </button>
                     </div>
-                    <div id="adminClientsList" class="data-grid-list">
-                        <p class="text-secondary">Cargando clientes...</p>
-                    </div>
-                </div>
+                    <div id="adminClientsList" class="list-container mt-16">
+                        </div>
+                </section>
 
-                <div id="adminEnterprises" class="tab-content">
+                <section id="adminEnterpriseTab" class="tab-content">
                     <div class="section-header">
-                        <h3>Gestión de Empresas</h3>
-                        <button class="btn btn-primary btn-sm" onclick="openCreateEnterpriseModal()">
-                            <i class="fas fa-city"></i> Nueva Empresa
+                        <h3 class="section-title">Gestión de Empresas</h3>
+                        <button class="btn btn-success" onclick="openCreateEnterpriseModal()">
+                            <i class="fas fa-building"></i> Nueva Empresa
                         </button>
                     </div>
-                    <div id="adminEnterprisesList" class="data-grid-list">
-                        <p class="text-secondary">Cargando empresas...</p>
-                    </div>
-                </div>
+                    <div id="adminEnterpriseList" class="list-container mt-16">
+                        </div>
+                </section>
 
-                <div id="adminConfig" class="tab-content">
-                    <div class="section-header">
-                        <h3>Configuración del Sistema</h3>
-                        <button class="btn btn-success btn-sm" onclick="handleUpdateConfiguration()">
-                            <i class="fas fa-sync-alt"></i> Guardar Cambios
+                <section id="adminSettingsTab" class="tab-content">
+                    <h3 class="section-title">Configuración de la Aplicación</h3>
+                    <form id="configForm" class="config-form">
+                        <div class="form-group">
+                            <label for="puntos_por_mil">Puntos por cada $1000 de compra</label>
+                            <input type="number" id="puntos_por_mil" name="puntos_por_mil" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="tasa_descuento_puntos">Valor en pesos de 1 punto</label>
+                            <input type="number" id="tasa_descuento_puntos" name="tasa_descuento_puntos" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="admin_whatsapp">WhatsApp Admin (Notificaciones)</label>
+                            <input type="tel" id="admin_whatsapp" name="admin_whatsapp">
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-16">
+                            <i class="fas fa-save"></i> Guardar Configuración
                         </button>
-                    </div>
-                    <form id="configurationForm" class="form-container">
-                        <p class="text-secondary">Cargando configuración...</p>
                     </form>
-                </div>
-            </div>
+                </section>
+            </main>
         </div>
-
+        
         <div id="orderConfirmModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Confirmar Pedido</h3>
-                    <button class="close-btn" onclick="closeModal('orderConfirmModal')">&times;</button>
+                    <h4>Confirmar Pedido</h4>
                 </div>
                 <div class="modal-body">
-                    <h4 class="text-center mb-16">Total: <span id="finalOrderTotalDisplay">$0</span></h4>
-                    <form id="orderConfirmForm">
-                        <div class="form-group">
-                            <label for="orderNotes">Notas del pedido (opcional)</label>
-                            <textarea id="orderNotes" placeholder="Ej: Sin cebolla, entrega en portería..."></textarea>
-                        </div>
-                        <div class="form-group points-group">
-                            <label>Puntos a Canjear (Tienes <span id="availablePoints">0</span>)</label>
-                            <input type="number" id="pointsToUse" min="0" value="0" oninput="calculatePointsDiscount()">
-                            <p class="text-secondary">Descuento aplicado: $<span id="pointsDiscountDisplay">0</span></p>
-                        </div>
-                    </form>
+                    <p>Vas a enviar un pedido con un total de **<span id="modalFinalTotal">$0</span>**.</p>
+                    <p>Se usarán **<span id="modalUsedPoints">0</span>** puntos de fidelización.</p>
+                    <p>¿Estás seguro de continuar?</p>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" onclick="closeModal('orderConfirmModal')">
                         <i class="fas fa-times"></i> Cancelar
                     </button>
                     <button class="btn btn-primary" onclick="handleOrderSubmit()">
-                        <i class="fas fa-paper-plane"></i> Enviar Pedido
+                        <i class="fas fa-check"></i> Sí, Enviar
                     </button>
                 </div>
             </div>
@@ -335,8 +284,7 @@
         <div id="createClientModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Crear Nuevo Cliente</h3>
-                    <button class="close-btn" onclick="closeModal('createClientModal')">&times;</button>
+                    <h4>Crear Nuevo Cliente</h4>
                 </div>
                 <div class="modal-body">
                     <form id="createClientForm">
@@ -349,7 +297,7 @@
                             <input type="email" id="newClientEmail" placeholder="cliente@example.com" required>
                         </div>
                         <div class="form-group">
-                            <label>Empresa (ID)</label>
+                            <label>Empresa</label>
                             <select id="newClientEnterpriseId" required>
                                 </select>
                         </div>
@@ -369,30 +317,30 @@
         <div id="createProductModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Crear Nuevo Producto</h3>
-                    <button class="close-btn" onclick="closeModal('createProductModal')">&times;</button>
+                    <h4>Crear Nuevo Producto</h4>
                 </div>
                 <div class="modal-body">
                     <form id="createProductForm">
                         <div class="form-group">
                             <label>Nombre</label>
-                            <input type="text" id="newProductName" placeholder="Ej: Café Americano" required>
+                            <input type="text" id="newProductName" placeholder="Ej: Hamburguesa Especial" required>
                         </div>
                         <div class="form-group">
                             <label>Precio</label>
-                            <input type="number" id="newProductPrice" placeholder="10000" min="0" required>
+                            <input type="number" id="newProductPrice" placeholder="Ej: 18000" min="0" required>
                         </div>
                         <div class="form-group">
                             <label>Categoría</label>
-                            <input type="text" id="newProductCategory" placeholder="Ej: Bebidas" required>
+                            <input type="text" id="newProductCategory" placeholder="Ej: hamburguesas" required>
                         </div>
                         <div class="form-group">
                             <label>Emoji</label>
-                            <input type="text" id="newProductEmoji" placeholder="☕" maxlength="5" required>
+                            <input type="text" id="newProductEmoji" placeholder="Ej: 🍔" maxlength="2" required>
                         </div>
-                        <div class="form-group checkbox-group">
-                            <input type="checkbox" id="newProductDaPuntos">
-                            <label for="newProductDaPuntos">Este producto otorga puntos</label>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="newProductDaPuntos" checked> Da Puntos de Fidelización
+                            </label>
                         </div>
                     </form>
                 </div>
@@ -410,14 +358,13 @@
         <div id="createEnterpriseModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Crear Nueva Empresa</h3>
-                    <button class="close-btn" onclick="closeModal('createEnterpriseModal')">&times;</button>
+                    <h4>Crear Nueva Empresa</h4>
                 </div>
                 <div class="modal-body">
                     <form id="createEnterpriseForm">
                         <div class="form-group">
                             <label>Nombre</label>
-                            <input type="text" id="newEnterpriseName" placeholder="Ej: Google Colombia" required>
+                            <input type="text" id="newEnterpriseName" placeholder="Ej: Tiendas Éxito" required>
                         </div>
                         <div class="form-group">
                             <label>Email</label>
@@ -447,8 +394,10 @@
                 </div>
             </div>
         </div>
+
         <div id="notificationContainer" class="notification-container"></div>
     </div>
-    <?!= include('app') ?> 
+    
+    <?!= include('APP') ?> 
 </body>
 </html>
